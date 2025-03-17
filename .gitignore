@@ -1,8 +1,10 @@
 *.egg-info
 *.pyc
 .vscode
+.idea
 outputs
 logs
 run_bash.sh
 wandb
 *rsl_rl*
+/.idea/inspectionProfiles/Project_Default.xml

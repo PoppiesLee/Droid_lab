@@ -49,8 +49,8 @@ H1_CFG = ArticulationCfg(
     actuators={
         "legs": ImplicitActuatorCfg(
             joint_names_expr=[".*_hip_yaw.*", ".*_hip_roll.*", ".*_hip_pitch.*", ".*_knee.*", ".*torso.*"],
-            effort_limit_sim=300.0,
-            velocity_limit_sim=100.0,
+            effort_limit=300.0,
+            velocity_limit=100.0,
             stiffness={
                 ".*_hip_yaw.*": 200.0,
                 ".*_hip_roll.*": 200.0,
@@ -68,15 +68,15 @@ H1_CFG = ArticulationCfg(
         ),
         "feet": ImplicitActuatorCfg(
             joint_names_expr=[".*_ankle.*"],
-            effort_limit_sim=100.0,
-            velocity_limit_sim=100.0,
+            effort_limit=100.0,
+            velocity_limit=100.0,
             stiffness={".*_ankle.*": 40.0},
             damping={".*_ankle.*": 2.0},
         ),
         "arms": ImplicitActuatorCfg(
             joint_names_expr=[".*_shoulder_pitch.*", ".*_shoulder_roll.*", ".*_shoulder_yaw.*", ".*_elbow.*"],
-            effort_limit_sim=300.0,
-            velocity_limit_sim=100.0,
+            effort_limit=300.0,
+            velocity_limit=100.0,
             stiffness={
                 ".*_shoulder_pitch.*": 100.0,
                 ".*_shoulder_roll.*": 50.0,
@@ -135,8 +135,8 @@ G1_CFG = ArticulationCfg(
                 ".*_knee_joint",
                 ".*waist.*",
             ],
-            effort_limit_sim=300.0,
-            velocity_limit_sim=100.0,
+            effort_limit=300.0,
+            velocity_limit=100.0,
             stiffness={
                 ".*_hip_yaw_joint": 150.0,
                 ".*_hip_roll_joint": 150.0,
@@ -158,7 +158,7 @@ G1_CFG = ArticulationCfg(
             },
         ),
         "feet": ImplicitActuatorCfg(
-            effort_limit_sim=20,
+            effort_limit=20,
             joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
             stiffness=20.0,
             damping=2.0,
@@ -169,8 +169,8 @@ G1_CFG = ArticulationCfg(
                 ".*_shoulder_pitch.*",
                 ".*_shoulder_roll.*",
             ],
-            effort_limit_sim=300.0,
-            velocity_limit_sim=100.0,
+            effort_limit=300.0,
+            velocity_limit=100.0,
             stiffness=100.0,
             damping=2.0,
             armature={
@@ -183,8 +183,8 @@ G1_CFG = ArticulationCfg(
                 ".*_shoulder_yaw.*",
                 ".*_elbow_.*",
             ],
-            effort_limit_sim=300.0,
-            velocity_limit_sim=100.0,
+            effort_limit=300.0,
+            velocity_limit=100.0,
             stiffness=50.0,
             damping=2.0,
             armature={
@@ -196,8 +196,8 @@ G1_CFG = ArticulationCfg(
             joint_names_expr=[
                 ".*_wrist_.*",
             ],
-            effort_limit_sim=300.0,
-            velocity_limit_sim=100.0,
+            effort_limit=300.0,
+            velocity_limit=100.0,
             stiffness=40.0,
             damping=2.0,
             armature={
