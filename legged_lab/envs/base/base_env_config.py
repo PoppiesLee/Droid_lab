@@ -67,7 +67,7 @@ class BaseEnvCfg:
         add_noise=True,
         noise_level=1.0,
         noise_scales=NoiseScalesCfg(
-            ang_vel=0.2,
+            ang_vel=0.5,
             projected_gravity=0.05,
             joint_pos=0.01,
             joint_vel=1.5,
@@ -124,8 +124,8 @@ class BaseEnvCfg:
         ),
     )
     sim: SimCfg = SimCfg(
-        dt=0.005,
-        decimation=4,
+        dt=0.001,
+        decimation=10,
         physx=PhysxCfg(
             gpu_max_rigid_patch_count=10 * 2**15
         )

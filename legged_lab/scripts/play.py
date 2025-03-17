@@ -8,6 +8,7 @@ from isaaclab.app import AppLauncher
 from rsl_rl.runners import OnPolicyRunner
 # local imports
 import legged_lab.utils.cli_args as cli_args  # isort: skip
+from deploy.tools.update_policies import PolicyManager
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
@@ -82,6 +83,14 @@ def play():
     export_policy_as_onnx(
         runner.alg.actor_critic, normalizer=runner.obs_normalizer, path=export_model_dir, filename="policy.onnx"
     )
+    # 去掉路径末尾的斜杠（如果存在）
+    temp_path = export_model_dir.rstrip("/")
+    # 去掉路径中的最后一部分
+    log_path = os.path.dirname(temp_path)
+    policies_destination_path = "legged_lab/../deploy/policies"
+
+    manager = PolicyManager(log_path, policies_destination_path)
+    manager.run()
 
     if not args_cli.headless:
         from legged_lab.utils.keyboard import Keyboard
