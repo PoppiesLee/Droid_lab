@@ -37,14 +37,12 @@ def quat_to_grav(q, v):
     c = q_vec * np.expand_dims(np.sum(q_vec * v, axis=-1), axis=-1) * 2.0
     return a - b + c
 
-class Sim2Droid:
+class Sim2Mujo:
     def __init__(self, ):
         self.num_actions = 12
         self.num_observations = 45
         # joint target
         self.target_q = np.zeros(self.num_actions, dtype=np.double)
-        self.target_dq = np.zeros(self.num_actions, dtype=np.double)
-
         self.action = np.zeros(self.num_actions, dtype=np.double)
 
         self.onnx_policy = ort.InferenceSession(onnx_mode_path)
@@ -106,7 +104,7 @@ class Sim2Droid:
     def run(self):
         self.cnt_pd_loop = 0
         duration_second = self.cfg.decimation * self.cfg.dt  # 单位:s
-        for _ in tqdm(range(int(50 / duration_second)), desc="Simulating..."):
+        for _ in tqdm(range(int(500 / duration_second)), desc="Simulating..."):
             # Obtain an observation
             q, dq, obs = self.get_obs(self.cnt_pd_loop)
             # 1000hz -> 100hz
@@ -145,7 +143,7 @@ class Sim2Droid:
         # self.set_real_stop()
 
 if __name__ == '__main__':
-    mybot = Sim2Droid()
+    mybot = Sim2Mujo()
     # mybot.init_robot()
     # mybot.spin()
     print("start main run")

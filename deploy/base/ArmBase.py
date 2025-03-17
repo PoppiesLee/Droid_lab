@@ -1,6 +1,6 @@
 import math
 from Base import *
-from droidgym.Config import Config
+from policies.Config import Config
 from grpc import insecure_channel
 from protos import arm_service_pb2_grpc as arm_pb2_grpc
 from protos import droid_msg_pb2 as msg_pb2
@@ -8,7 +8,7 @@ from protos import droid_msg_pb2 as msg_pb2
 
 class ArmBase:
     def __init__(self, _cfg):
-        self.ArmEnvCfg = _cfg.env
+        self.ArmEnvCfg = _cfg
         self.armActions = self.ArmEnvCfg.num_arm_actions
         # grpc defines
         self.armConfigs = msg_pb2.DroidConfigs()
@@ -65,21 +65,21 @@ class ArmBase:
     def testArm(self):
         T = 2  # 总时间
         D2R = math.pi / 180.0
-        dt0 = [-30, 10, 0, 80, -100, -30, 10, 0, 80, -100]  # 假设 NMC 是一个定义好的常量，表示关节数量
+        dt0 = [-30, 10, 0, 80, -30, 10, 0, 80]  # 假设 NMC 是一个定义好的常量，表示关节数量
         dt0 = [x * D2R for x in dt0]
         # 填充 dt1 和 dt2 列表
-        dt1 = [-30 * D2R, 10 * D2R, 0, 100 * D2R, -100 * D2R, 30 * D2R, 10 * D2R, 0, 100 * D2R, -100 * D2R]
-        dt2 = [30 * D2R, 10 * D2R, 0, 100 * D2R, -100 * D2R, -30 * D2R, 10 * D2R, 0, 100 * D2R, -100 * D2R]
+        dt1 = [-30 * D2R, 10 * D2R, 0, 100 * D2R, 30 * D2R, 10 * D2R, 0, 100 * D2R]
+        dt2 = [30 * D2R, 10 * D2R, 0, 100 * D2R, -30 * D2R, 10 * D2R, 0, 100 * D2R]
 
         # 执行关节规划
         for i in range(2):
             print("wave round %d" % (i * 2 + 1))
-            for idx in range(12):
-                self.armCommand.finger[idx] = 50
+            # for idx in range(12):
+            #     self.armCommand.finger[idx] = 50
             self.set_arm_path(T, dt1)
             print("wave round %d" % (i * 2 + 2))
-            for idx in range(12):
-                self.armCommand.finger[idx] = 5
+            # for idx in range(12):
+            #     self.armCommand.finger[idx] = 5
             self.set_arm_path(T, dt2)
         print("return to zero")
         gBot.set_arm_path(T, dt0)

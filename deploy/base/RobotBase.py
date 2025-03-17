@@ -3,7 +3,7 @@ import time
 from base.Base import NanoSleep
 from base.ArmBase import ArmBase
 from base.LegBase import LegBase
-from droidgym.Config import Config
+from policies.Config import Config
 
 
 class RobotBase(ArmBase, LegBase):

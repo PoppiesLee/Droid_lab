@@ -61,9 +61,9 @@ def set_motor_mode(command, config):
 def set_joint_mode(command, config, num_actions):
     command.cmd_enable = 2
     for idx in range(num_actions):
-        command.kp[idx] = config.kp[idx]
-        command.kd[idx] = config.kd[idx]
-        command.max_torque[idx] = config.tau_limit[idx]
+        command.kp[idx] = config.dof_stiffness[idx]
+        command.kd[idx] = config.dof_damping[idx]
+        command.max_torque[idx] = config.effort_limit[idx]
 
 
 def print_configs(config):
