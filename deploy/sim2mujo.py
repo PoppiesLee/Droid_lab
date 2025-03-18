@@ -6,11 +6,14 @@ import mujoco_viewer
 import numpy as np
 from tqdm import tqdm
 import onnxruntime as ort
+from tools.aoa_ctrl import AoaReader
 from tools.load_env_config import load_configuration
 from deploy.tools.CircularBuffer import CircularBuffer
 
 onnx_mode_path = f"policies/policy.onnx"
 mujoco_model_path = f"../legged_lab/assets/droid/x02a/scene.xml"
+MAX_LINE_VEL  = 1.5
+MAX_ANGLE_VEL = 0.5
 
 #                           0            1              2              3               4                5               6               7               8                 9                10             11
 IsaacLabJointOrder = ['L_hip_yaw',   'R_hip_yaw',  'L_hip_roll',   'R_hip_roll',   'L_hip_pitch',  'R_hip_pitch', 'L_knee_pitch', 'R_knee_pitch', 'L_ankle_pitch', 'R_ankle_pitch',  'L_ankle_roll', 'R_ankle_roll']
@@ -37,11 +40,34 @@ def quat_to_grav(q, v):
     c = q_vec * np.expand_dims(np.sum(q_vec * v, axis=-1), axis=-1) * 2.0
     return a - b + c
 
-class Sim2Mujo:
-    def __init__(self, ):
+
+def get_command(last_value, current_value, max_increment):
+    """
+    返回一个值，该值满足最大增量限制。
+
+    :param last_value: 上一个值
+    :param current_value: 当前值
+    :param max_increment: 最大增量
+    :return: 限制后的值
+    """
+    # 计算当前值与上一个值之间的差值
+    increment = current_value - last_value
+    # 如果差值的绝对值超过了最大增量，则限制它
+    if abs(increment) > max_increment:
+        # 如果差值为正，则增加最大增量；如果差值为负，则减少最大增量
+        return last_value + (max_increment if increment > 0 else -max_increment)
+    # 如果差值在允许范围内，则直接返回当前值
+    return current_value
+
+
+class Sim2Mujo():
+    def __init__(self):
         self.num_actions = 12
         self.num_observations = 45
+        self.aoa_reader = AoaReader()
+        self.aoa_reader.start_server()
         # joint target
+        self.command = [0., 0., 0.]
         self.target_q = np.zeros(self.num_actions, dtype=np.double)
         self.action = np.zeros(self.num_actions, dtype=np.double)
 
@@ -73,13 +99,20 @@ class Sim2Mujo:
         proj_grav = quat_to_grav(quat, [0, 0, -1])
         # euler = quaternion_to_euler_array(quat)
         # euler[euler > math.pi] -= 2 * math.pi
+        if self.aoa_reader.result_event.is_set():  # 检查是否有新的结果
+            self.aoa_reader.result_event.clear()  # 清除事件
+            if self.aoa_reader.result['nodes']:
+                distance = self.aoa_reader.result['nodes'][0]['dis'] - 0.5
+                angle = -self.aoa_reader.result['nodes'][0]['angle'] * math.pi / 180.0
+                distance = get_command(self.command[0], distance, 0.01)
+                angle = get_command(self.command[2], angle, 0.01)
+                self.command[0] = min(distance, MAX_LINE_VEL)
+                self.command[2] = min(angle, MAX_ANGLE_VEL)
 
         obs = np.zeros(self.num_observations, dtype=np.float32)
         obs[0:3] = ang_vel
         obs[3:6] = proj_grav
-        obs[6] = 0.5
-        obs[7] = 0.
-        obs[8] = 0.
+        obs[6:9] = self.command
         obs[9: 21] = q[Mujoco_to_Isaac_indices] - self.cfg.default_joints[Mujoco_to_Isaac_indices]
         obs[21: 33] = dq[Mujoco_to_Isaac_indices]
         obs[33: 45] = self.action[Mujoco_to_Isaac_indices]
@@ -104,7 +137,7 @@ class Sim2Mujo:
     def run(self):
         self.cnt_pd_loop = 0
         duration_second = self.cfg.decimation * self.cfg.dt  # 单位:s
-        for _ in tqdm(range(int(500 / duration_second)), desc="Simulating..."):
+        for _ in tqdm(range(int(5000 / duration_second)), desc="Simulating..."):
             # Obtain an observation
             q, dq, obs = self.get_obs(self.cnt_pd_loop)
             # 1000hz -> 100hz
@@ -115,6 +148,9 @@ class Sim2Mujo:
             self.pd_control(self.target_q, q, dq)
             self.cnt_pd_loop += 1
         self.viewer.close()
+
+    def stop(self):
+        self.aoa_reader.stop_server()
 
     def init_robot(self):
         final_goal = self.cfg.default_joints[:]
@@ -147,4 +183,10 @@ if __name__ == '__main__':
     # mybot.init_robot()
     # mybot.spin()
     print("start main run")
-    mybot.run()
+    try:
+        while True:
+            mybot.run()
+    except KeyboardInterrupt:
+        print("\n用户中断，停止程序")
+    finally:
+        mybot.stop()

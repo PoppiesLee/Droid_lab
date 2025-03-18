@@ -1,8 +1,8 @@
 import math
 from Base import *
 from grpc import insecure_channel
-from deploy.protos import leg_service_pb2_grpc as leg_pb2_grpc
-from deploy.protos import droid_msg_pb2 as msg_pb2
+from protos import leg_service_pb2_grpc as leg_pb2_grpc
+from protos import droid_msg_pb2 as msg_pb2
 
 grpc_channel = '192.168.55.110'
 

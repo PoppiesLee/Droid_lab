@@ -8,7 +8,7 @@ from base.Base import NanoSleep
 from base.LegBase import LegBase
 from base.Base import set_joint_mode
 from tools.load_env_config import load_configuration
-from deploy.tools.CircularBuffer import CircularBuffer
+from tools.CircularBuffer import CircularBuffer
 
 onnx_mode_path = f"policies/policy.onnx"
 #                           0            1              2              3               4                5               6               7               8                 9                10             11

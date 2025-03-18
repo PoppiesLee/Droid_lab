@@ -1,0 +1,16 @@
+[Unit]
+Description=Deploy RL Controller Description
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+ExecStart=/home/x02lite/deploy/script/deploy_rl.sh
+ExecStop=/usr/bin/kill -9 $MAINPID
+StandardOutput=null
+TimeoutStopSec=1
+User=x02lite
+
+[Install]
+WantedBy=multi-user.target
