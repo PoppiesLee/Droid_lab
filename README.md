@@ -49,6 +49,10 @@ pip install -e legged_lab
 
 ```bash
 python legged_lab/scripts/train.py --task=h1_flat --headless --logger=tensorboard --num_envs=64
+
+python legged_lab/scripts/train.py --task=x02a_flat --headless --logger=tensorboard --num_envs=4096
+
+python legged_lab/scripts/paly.py --task=x02a_flat --num_envs=64
 ```
 
 

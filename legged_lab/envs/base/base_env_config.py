@@ -139,7 +139,7 @@ class BaseEnvCfg:
 class BaseAgentCfg:
     resume: bool = False
     num_steps_per_env: int = 24
-    max_iterations: int = 50000
+    max_iterations: int = 10000
     save_interval: int = 100
     experiment_name: str = MISSING
     empirical_normalization: bool = False

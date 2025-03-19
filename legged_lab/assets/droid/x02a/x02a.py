@@ -49,10 +49,10 @@ X02A_CFG = ArticulationCfg(
             # ".*_shoulder_yaw": 0.0,
             # ".*_elbow": 1.920,  # 110 degrees
             ".*_hip_yaw": 0.0,
-            ".*_hip_roll": 0.0,
-            ".*_hip_pitch": 0.4,  # 30 degrees
-            ".*_knee_pitch": -0.8,  # -60 degrees
-            ".*_ankle_pitch": 0.4,  # 33 degrees
+            ".*_hip_roll": 0.05,
+            ".*_hip_pitch": 0.0,
+            ".*_knee_pitch": 0.0,
+            ".*_ankle_pitch": 0.0,
             ".*_ankle_roll": 0.0,
         },
         joint_vel={".*": 0.0},

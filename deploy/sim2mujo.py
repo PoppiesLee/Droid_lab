@@ -112,7 +112,7 @@ class Sim2Mujo():
         obs = np.zeros(self.num_observations, dtype=np.float32)
         obs[0:3] = ang_vel
         obs[3:6] = proj_grav
-        obs[6:9] = self.command
+        obs[6:9] = [1.5, 0., 0.]
         obs[9: 21] = q[Mujoco_to_Isaac_indices] - self.cfg.default_joints[Mujoco_to_Isaac_indices]
         obs[21: 33] = dq[Mujoco_to_Isaac_indices]
         obs[33: 45] = self.action[Mujoco_to_Isaac_indices]
