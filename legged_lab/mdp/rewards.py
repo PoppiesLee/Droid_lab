@@ -129,3 +129,16 @@ def feet_too_near_humanoid(env: BaseEnv, asset_cfg: SceneEntityCfg = SceneEntity
     feet_pos = asset.data.body_pos_w[:, asset_cfg.body_ids, :]
     distance = torch.norm(feet_pos[:, 0] - feet_pos[:, 1], dim=-1)
     return (threshold - distance).clamp(min=0)
+
+def feet_swing(env: BaseEnv, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
+    left_swing = (torch.abs(env.gait_process - 0.25) < 0.5 * 0.2) & (env.gait_frequency > 1.0e-8)
+    right_swing = (torch.abs(env.gait_process - 0.75) < 0.5 * 0.2) & (env.gait_frequency > 1.0e-8)
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    feet_contact = contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, 2] > 3
+    return (left_swing & ~feet_contact[:, 0]).float() + (right_swing & ~feet_contact[:, 1]).float()
+
+# def feet_contact_error(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
+#     contact_sensor: ContactSensor = env.scene[sensor_cfg.name]
+#     contact = contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, 2] > 5
+#     stance_mask = env.contact_phase()
+#     return torch.mean(torch.where(contact == stance_mask, 1, -0.3), dim=1)

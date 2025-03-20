@@ -62,8 +62,9 @@ def get_command(last_value, current_value, max_increment):
 
 class Sim2Mujo():
     def __init__(self):
+        self.gait_frequency = 0
         self.num_actions = 12
-        self.num_observations = 45
+        self.num_observations = 47
         self.aoa_reader = AoaReader()
         self.aoa_reader.start_server()
         # joint target
@@ -91,7 +92,7 @@ class Sim2Mujo():
         print("\nMujoco actuators order:\n",actuators, "\n")
         return actuators
 
-    def get_obs(self, _cnt_pd_loop):
+    def get_obs(self, gait_process):
         q = self.data.qpos.astype(np.float32)[7:]
         dq = self.data.qvel.astype(np.float32)[6:]
         ang_vel = self.data.sensor('gyro').data.astype(np.float32)
@@ -108,14 +109,21 @@ class Sim2Mujo():
                 angle = get_command(self.command[2], angle, 0.01)
                 self.command[0] = min(distance, MAX_LINE_VEL)
                 self.command[2] = min(angle, MAX_ANGLE_VEL)
+        # self.command = [1.5, 0., 0.5]
+        if self.command[0] == 0 and self.command[1] == 0 and self.command[2] == 0:
+            self.gait_frequency = 0
+        else:
+            self.gait_frequency = 2.0
 
         obs = np.zeros(self.num_observations, dtype=np.float32)
         obs[0:3] = ang_vel
         obs[3:6] = proj_grav
-        obs[6:9] = [1.5, 0., 0.]
-        obs[9: 21] = q[Mujoco_to_Isaac_indices] - self.cfg.default_joints[Mujoco_to_Isaac_indices]
-        obs[21: 33] = dq[Mujoco_to_Isaac_indices]
-        obs[33: 45] = self.action[Mujoco_to_Isaac_indices]
+        obs[6:9] = self.command
+        obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
+        obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
+        obs[11: 23] = q[Mujoco_to_Isaac_indices] - self.cfg.default_joints[Mujoco_to_Isaac_indices]
+        obs[23: 35] = dq[Mujoco_to_Isaac_indices]
+        obs[35: 47] = self.action[Mujoco_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
         return q, dq, obs
 
@@ -135,15 +143,18 @@ class Sim2Mujo():
         return self.action * self.cfg.action_scale + self.cfg.default_joints
 
     def run(self):
+        gait_process = 0
         self.cnt_pd_loop = 0
         duration_second = self.cfg.decimation * self.cfg.dt  # 单位:s
         for _ in tqdm(range(int(5000 / duration_second)), desc="Simulating..."):
             # Obtain an observation
-            q, dq, obs = self.get_obs(self.cnt_pd_loop)
+
             # 1000hz -> 100hz
             if self.cnt_pd_loop % self.cfg.decimation == 0:
+                q, dq, obs = self.get_obs(gait_process)
                 self.hist_obs.append(obs)
                 self.target_q = self.get_action(self.hist_obs.get())
+                gait_process = np.fmod(gait_process + duration_second * self.gait_frequency, 1.0)
             # Generate PD control
             self.pd_control(self.target_q, q, dq)
             self.cnt_pd_loop += 1

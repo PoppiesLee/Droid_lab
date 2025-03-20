@@ -88,7 +88,7 @@ class PolicyManager:
 
 # 使用示例
 if __name__ == "__main__":
-    policies_folder_path = "../../logs/x02a_flat/2025-03-17_19-42-20/"
+    policies_folder_path = "../../logs/x02a_flat/2025-03-19_22-38-56/"
     policies_destination_path = "../policies"
 
     manager = PolicyManager(policies_folder_path, policies_destination_path)

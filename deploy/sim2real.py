@@ -70,10 +70,12 @@ class Sim2Real(LegBase):
     def __init__(self):
         super().__init__()
         self.num_actions = 12
-        self.num_observations = 45
+        self.num_observations = 47
+        self.gait_frequency = 0
         self.cfg = load_configuration("policies/env_cfg.json", MujocoJointOrder)
         self.run_flag = True
         # joint target
+        self.command = [0., 0., 0.]
         self.target_q = np.zeros(self.legActions, dtype=np.double)
         self.action = np.zeros(self.legActions, dtype=np.double)
         self.onnx_policy = ort.InferenceSession(onnx_mode_path)
@@ -111,20 +113,23 @@ class Sim2Real(LegBase):
         base_euler[base_euler > math.pi] -= 2 * math.pi
         eq = euler_to_quaternion(base_euler[0], base_euler[1], base_euler[2])
         eq = np.array(eq, dtype=np.double)
-        project_gravity = quat_rotate_inverse(eq, np.array([0., 0., -0.981]))
-        lin_vel_x = self.legState.rc_du[0]
-        lin_vel_y = self.legState.rc_du[1]
-        ang_vel_yaw = self.legState.rc_du[2]
-
+        project_gravity = quat_rotate_inverse(eq, np.array([0., 0., -1]))
+        self.command = [self.legState.rc_du[0], self.legState.rc_du[1], -self.legState.rc_du[3]]
+        # 遥控器键值变步频处理
+        if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
+            self.gait_frequency = 0
+        else:
+            max_abs_command = max(abs(self.command[0]), abs(self.command[1]), abs(self.command[2]))
+            self.gait_frequency = max_abs_command + 1
         obs = np.zeros([self.num_observations], dtype=np.float32)
         obs[0:3] = base_ang_vel * 1.0
         obs[3:6] = project_gravity * 1.0
-        obs[6] = lin_vel_x * 1.0
-        obs[7] = lin_vel_y * 1.0
-        obs[8] = ang_vel_yaw * 1.0
-        obs[9: 21] = q[Mujoco_to_Isaac_indices] - self.cfg.default_joints[Mujoco_to_Isaac_indices]
-        obs[21: 33] = dq[Mujoco_to_Isaac_indices]
-        obs[33: 45] = self.action[Mujoco_to_Isaac_indices]
+        obs[6:9] = self.command
+        obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
+        obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
+        obs[11: 23] = q[Mujoco_to_Isaac_indices] - self.cfg.default_joints[Mujoco_to_Isaac_indices]
+        obs[23: 35] = dq[Mujoco_to_Isaac_indices]
+        obs[35: 47] = self.action[Mujoco_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
         return q, dq, obs
 
@@ -150,6 +155,7 @@ class Sim2Real(LegBase):
 
     def run(self):
         pre_tic = 0
+        gait_process = 0
         duration_second = self.cfg.decimation * self.cfg.dt  # 单位:s
         duration_millisecond = duration_second * 1000  # 单位：ms
         timer = NanoSleep(duration_millisecond)  # 创建一个decimation毫秒的NanoSleep对象
@@ -162,7 +168,7 @@ class Sim2Real(LegBase):
             if self.legState.rc_keys[0] > 64:
                 print("紧急停止！！！")
                 exit()
-            q, dq, obs = self.get_obs(0)
+            q, dq, obs = self.get_obs(gait_process)
             self.hist_obs.append(obs)
             self.target_q = self.get_action(self.hist_obs.get())
             # self.target_q = self.leg_ref_trajectory(cnt_pd_loop)  # 参考轨迹可视化，需要将xml中的<freejoint/>注释掉，将机器人挂起来
@@ -175,6 +181,7 @@ class Sim2Real(LegBase):
                 runTime=f"{(time.perf_counter() - start):.3f}s"  # 运行时间，单位秒
             )
             pre_tic = self.legState.system_tic
+            gait_process = np.fmod(gait_process + duration_second * self.gait_frequency, 1.0)
             timer.waiting(start_time)
         self.set_leg_path(1, self.cfg.default_joints)
 

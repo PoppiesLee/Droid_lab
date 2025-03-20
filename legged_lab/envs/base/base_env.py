@@ -13,6 +13,7 @@ from isaaclab.envs.mdp.commands import UniformVelocityCommand, UniformVelocityCo
 from isaaclab.envs.mdp.events import randomize_rigid_body_material, randomize_rigid_body_mass, reset_joints_by_scale, reset_root_state_uniform, push_by_setting_velocity
 from isaaclab.managers import RewardManager
 from isaaclab.utils.buffers import CircularBuffer, DelayBuffer
+from isaacsim.core.utils.torch.maths import torch_rand_float
 
 
 class BaseEnv(VecEnv):
@@ -98,6 +99,8 @@ class BaseEnv(VecEnv):
 
         self.episode_length_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.long)
         self.time_out_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.bool)
+        self.gait_frequency = torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
+        self.gait_process = torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
         self.init_obs_buffer()
 
     def compute_current_observations(self):
@@ -114,6 +117,8 @@ class BaseEnv(VecEnv):
             ang_vel * self.obs_scales.ang_vel,
             projected_gravity * self.obs_scales.projected_gravity,
             command * self.obs_scales.commands,
+            (torch.cos(2 * torch.pi * self.gait_process) * (self.gait_frequency > 1.0e-8).float()).unsqueeze(-1),
+            (torch.sin(2 * torch.pi * self.gait_process) * (self.gait_frequency > 1.0e-8).float()).unsqueeze(-1),
             joint_pos * self.obs_scales.joint_pos,
             joint_vel * self.obs_scales.joint_vel,
             action * self.obs_scales.actions
@@ -199,7 +204,10 @@ class BaseEnv(VecEnv):
         reward_buf = self.reward_maneger.compute(self.step_dt)
         env_ids = self.reset_buf.nonzero(as_tuple=False).flatten()
         self.reset(env_ids)
-
+        self.gait_frequency[env_ids] = torch_rand_float(1.0, 2.0, (len(env_ids), 1), device=self.device).squeeze(1)
+        still_envs = env_ids[torch.randperm(len(env_ids))[: int(0.1 * len(env_ids))]]
+        self.command_generator.command[still_envs, :] = 0.0
+        self.gait_frequency[still_envs] = 0.0
         actor_obs, critic_obs = self.compute_observations()
         self.extras["observations"] = {"critic": critic_obs}
 
@@ -207,6 +215,7 @@ class BaseEnv(VecEnv):
 
     def post_step_callback(self):
         self.command_generator.compute(self.step_dt)
+        self.gait_process[:] = torch.fmod(self.gait_process + self.step_dt * self.gait_frequency, 1.0)
         if self.cfg.domain_rand.push_robot.enable:
             env_ids = (self.episode_length_buf % int(self.cfg.domain_rand.push_robot.push_interval_s / self.step_dt) == 0).nonzero(as_tuple=False).flatten()
             if len(env_ids) != 0:
