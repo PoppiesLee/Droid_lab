@@ -15,18 +15,11 @@ import os
 import isaaclab.sim as sim_utils
 from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
-
-##
-# Configuration
-##
-# 构建相对路径（假设要从当前脚本所在目录的父目录出发去找到目标文件）
-current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-usd_X02A_path = os.path.join(current_dir, "x02a/x02a.usd")
-
+from legged_lab.assets import ISAAC_ASSET_DIR
 
 X02A_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=usd_X02A_path,
+        usd_path=f"{ISAAC_ASSET_DIR}/droid/x02a/x02a.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -136,10 +129,3 @@ X02A_CFG = ArticulationCfg(
 )
 """Configuration for the Droid X02A Humanoid robot."""
 
-
-X02A_MINIMAL_CFG = X02A_CFG.copy()
-X02A_MINIMAL_CFG.spawn.usd_path = usd_X02A_path
-"""Configuration for the Droid X02A Humanoid robot with fewer collision meshes.
-
-This configuration removes most collision meshes to speed up simulation.
-"""
