@@ -109,12 +109,13 @@ class Sim2Mujo():
                 angle = get_command(self.command[2], angle, 0.01)
                 self.command[0] = min(distance, MAX_LINE_VEL)
                 self.command[2] = min(angle, MAX_ANGLE_VEL)
-        # self.command = [1.5, 0., 0.5]
-        if self.command[0] == 0 and self.command[1] == 0 and self.command[2] == 0:
+        self.command = [0., 0., 0.]
+        # 遥控器键值变步频处理
+        if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
             self.gait_frequency = 0
         else:
-            self.gait_frequency = 2.0
-
+            max_abs_command = max(abs(self.command[0]), abs(self.command[1]), abs(self.command[2]))
+            self.gait_frequency = 1.5
         obs = np.zeros(self.num_observations, dtype=np.float32)
         obs[0:3] = ang_vel
         obs[3:6] = proj_grav

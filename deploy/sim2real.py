@@ -114,13 +114,13 @@ class Sim2Real(LegBase):
         eq = euler_to_quaternion(base_euler[0], base_euler[1], base_euler[2])
         eq = np.array(eq, dtype=np.double)
         project_gravity = quat_rotate_inverse(eq, np.array([0., 0., -1]))
-        self.command = [self.legState.rc_du[0], self.legState.rc_du[1], -self.legState.rc_du[3]]
+        self.command = [self.legState.rc_du[0], self.legState.rc_du[1] * 0.5, -self.legState.rc_du[3] * 0.5]
         # 遥控器键值变步频处理
         if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
             self.gait_frequency = 0
         else:
             max_abs_command = max(abs(self.command[0]), abs(self.command[1]), abs(self.command[2]))
-            self.gait_frequency = max_abs_command + 1
+            self.gait_frequency = 1.5
         obs = np.zeros([self.num_observations], dtype=np.float32)
         obs[0:3] = base_ang_vel * 1.0
         obs[3:6] = project_gravity * 1.0

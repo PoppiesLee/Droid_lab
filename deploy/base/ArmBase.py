@@ -1,9 +1,9 @@
 import math
 from Base import *
-from policies.Config import Config
+from deploy.policies.Config import Config
 from grpc import insecure_channel
-from protos import arm_service_pb2_grpc as arm_pb2_grpc
-from protos import droid_msg_pb2 as msg_pb2
+from deploy.protos import arm_service_pb2_grpc as arm_pb2_grpc
+from deploy.protos import droid_msg_pb2 as msg_pb2
 
 
 class ArmBase:
@@ -63,7 +63,7 @@ class ArmBase:
             timer.waiting(start_time)  # 等待下一个时间步长
 
     def testArm(self):
-        T = 2  # 总时间
+        T = 1  # 总时间
         D2R = math.pi / 180.0
         dt0 = [-30, 10, 0, 80, -30, 10, 0, 80]  # 假设 NMC 是一个定义好的常量，表示关节数量
         dt0 = [x * D2R for x in dt0]

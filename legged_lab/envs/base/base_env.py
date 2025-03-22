@@ -52,6 +52,19 @@ class BaseEnv(VecEnv):
         if self.cfg.scene.height_scanner.enable_height_scan:
             self.height_scanner: RayCaster = self.scene.sensors["height_scanner"]
 
+        links_num = self.robot.num_bodies
+        links_mass = self.scene["robot"].data.default_mass[0, :]
+        body_names = self.robot.data.body_names
+        print("\033[32m>>The total %2d links masses: %7.3f, Detailed information as follow:\033[0m" % (links_num, links_mass.sum()))
+        print("\033[32m+--------------------+-----+-----------+\033[0m")
+        print(
+            "\033[33m|     links names    | idx | link mass |\033[0m")
+        print("\033[32m+--------------------+-----+-----------+\033[0m")
+        for i in range(0, links_num):
+            print("| %-19s|  %2d |  %7.3f  |" % (
+                body_names[i], i, links_mass[i]))
+        print("\033[32m+--------------------+-----+-----------+\033[0m")
+
         command_cfg = UniformVelocityCommandCfg(
             asset_name="robot",
             resampling_time_range=self.cfg.commands.resampling_time_range,
