@@ -7,8 +7,9 @@ from deploy.protos import droid_msg_pb2 as msg_pb2
 
 
 class ArmBase:
-    def __init__(self, _cfg):
-        self.ArmEnvCfg = _cfg
+    def __init__(self):
+        print("Initializing ArmBase")
+        self.ArmEnvCfg = Config
         self.armActions = self.ArmEnvCfg.num_arm_actions
         # grpc defines
         self.armConfigs = msg_pb2.DroidConfigs()
@@ -86,7 +87,7 @@ class ArmBase:
 
 
 if __name__ == '__main__':
-    gBot = ArmBase(Config)
+    gBot = ArmBase()
     gBot.testArm()
 
 

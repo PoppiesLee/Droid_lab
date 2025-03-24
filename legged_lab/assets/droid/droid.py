@@ -31,16 +31,16 @@ X02A_CFG = ArticulationCfg(
             max_depenetration_velocity=1.0,
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=4
+            enabled_self_collisions=True, solver_position_iteration_count=4, solver_velocity_iteration_count=4
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
         pos=(0.0, 0.0, 1.13),
         joint_pos={
-            # ".*_shoulder_pitch": -0.262,  # -15 degrees
-            # ".*_shoulder_roll": 0.0,
-            # ".*_shoulder_yaw": 0.0,
-            # ".*_elbow": 1.920,  # 110 degrees
+            ".*_shoulder_pitch": -0.5236,  # -15 degrees
+            ".*_shoulder_roll": 0.1745,
+            ".*_shoulder_yaw": 0.0,
+            ".*_elbow": 1.3963,  # 110 degrees
             ".*_hip_yaw": 0.0,
             ".*_hip_roll": 0.05,
             ".*_hip_pitch": 0.0,
@@ -108,23 +108,39 @@ X02A_CFG = ArticulationCfg(
                 ".*_ankle_roll": 0.01,
             },
         ),
-        # "arms": ImplicitActuatorCfg(
-        #     joint_names_expr=[".*_shoulder_pitch", ".*_shoulder_roll", ".*_shoulder_yaw", ".*_elbow"],
-        #     effort_limit=300,
-        #     velocity_limit=100.0,
-        #     stiffness={
-        #         ".*_shoulder_pitch": 40.0,
-        #         ".*_shoulder_roll": 40.0,
-        #         ".*_shoulder_yaw": 40.0,
-        #         ".*_elbow": 40.0,
-        #     },
-        #     damping={
-        #         ".*_shoulder_pitch": 10.0,
-        #         ".*_shoulder_roll": 10.0,
-        #         ".*_shoulder_yaw": 10.0,
-        #         ".*_elbow": 10.0,
-        #     },
-        # ),
+        "arms": ImplicitActuatorCfg(
+            joint_names_expr=[".*_shoulder_pitch", ".*_shoulder_roll", ".*_shoulder_yaw", ".*_elbow"],
+            effort_limit={
+                ".*_shoulder_pitch": 100.0,
+                ".*_shoulder_roll": 100.0,
+                ".*_shoulder_yaw": 100.0,
+                ".*_elbow": 100.0,
+            },
+            velocity_limit={
+                ".*_shoulder_pitch": 50.0,
+                ".*_shoulder_roll": 50.0,
+                ".*_shoulder_yaw": 50.0,
+                ".*_elbow": 50.0,
+            },
+            stiffness={
+                ".*_shoulder_pitch": 40.0,
+                ".*_shoulder_roll": 40.0,
+                ".*_shoulder_yaw": 40.0,
+                ".*_elbow": 40.0,
+            },
+            damping={
+                ".*_shoulder_pitch": 10.0,
+                ".*_shoulder_roll": 10.0,
+                ".*_shoulder_yaw": 10.0,
+                ".*_elbow": 10.0,
+            },
+            armature={
+                ".*_shoulder_pitch": 0.01,
+                ".*_shoulder_roll": 0.01,
+                ".*_shoulder_yaw": 0.01,
+                ".*_elbow": 0.01,
+            },
+        ),
     },
 )
 """Configuration for the Droid X02A Humanoid robot."""

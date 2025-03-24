@@ -1,21 +1,21 @@
 import math
 from Base import *
 from grpc import insecure_channel
-from protos import leg_service_pb2_grpc as leg_pb2_grpc
-from protos import droid_msg_pb2 as msg_pb2
+from deploy.protos import leg_service_pb2_grpc as leg_pb2_grpc
+from deploy.protos import droid_msg_pb2 as msg_pb2
 
 grpc_channel = '192.168.55.110'
 
 class LegBase:
     def __init__(self):
-        self.num_leg_actions = 12
-        self.legActions = self.num_leg_actions
+        print("Initializing LegBase")
+        self.legActions = 12
         self.legConfigs = msg_pb2.DroidConfigs()
         self.legState = msg_pb2.DroidStateResponse()
         self.legCommand = msg_pb2.DroidCommandRequest()
         channel = insecure_channel(grpc_channel + ":50051")
         self.legStub = leg_pb2_grpc.LegServiceStub(channel)
-        init_command(self.legCommand, self.num_leg_actions)
+        init_command(self.legCommand, self.legActions)
         # 建立通信，获取机器人底层信息
         self.get_leg_config()
         self.get_leg_state()

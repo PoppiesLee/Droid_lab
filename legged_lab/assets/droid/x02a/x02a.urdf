@@ -179,7 +179,7 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0.0515 0 -0.022" rpy="0 0 0" />
+      <origin xyz="0.0515 0 -0.0229" rpy="0 0 0" />
       <geometry>
         <box size="0.234 0.08 0.03" />
       </geometry>
@@ -335,7 +335,7 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0.0515 0 -0.022" rpy="0 0 0" />
+      <origin xyz="0.0515 0 -0.0229" rpy="0 0 0" />
       <geometry>
         <box size="0.234 0.08 0.03" />
       </geometry>
@@ -365,8 +365,8 @@
       </material>
     </visual>
   </link>
-  <joint name="L_shoulder_pitch" type="fixed">
-    <origin xyz="0 0.14043 0.29123" rpy="1.0 1.0 2.6" />
+  <joint name="L_shoulder_pitch" type="revolute">
+    <origin xyz="0 0.14043 0.29123" rpy="0 1.309 1.5708" />
     <parent link="pelvis_link" />
     <child link="L_shoulder_pitch_link" />
     <axis xyz="0 0 -1" />
@@ -387,8 +387,14 @@
         <color rgba="1 1 1 1" />
       </material>
     </visual>
+    <collision>
+      <origin xyz="0.07 0 0" rpy="0 1.57 0" />
+      <geometry>
+        <cylinder radius="0.04" length="0.08" />
+      </geometry>
+    </collision>
   </link>
-  <joint name="L_shoulder_roll" type="fixed">
+  <joint name="L_shoulder_roll" type="revolute">
     <origin xyz="0 0 0.0575" rpy="-1.5708 0.2618 0" />
     <parent link="L_shoulder_pitch_link" />
     <child link="L_shoulder_roll_link" />
@@ -410,8 +416,14 @@
         <color rgba="1 1 1 1" />
       </material>
     </visual>
+    <collision>
+      <origin xyz="0 0 0.07" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.04" length="0.1" />
+      </geometry>
+    </collision>
   </link>
-  <joint name="L_shoulder_yaw" type="fixed">
+  <joint name="L_shoulder_yaw" type="revolute">
     <origin xyz="0.112 0 0" rpy="1.5708 0 1.5708" />
     <parent link="L_shoulder_roll_link" />
     <child link="L_shoulder_yaw_link" />
@@ -433,9 +445,15 @@
         <color rgba="1 1 1 1" />
       </material>
     </visual>
+    <collision>
+      <origin xyz="0.22 -0.012 0" rpy="0 1.57 0" />
+      <geometry>
+        <cylinder radius="0.03" length="0.35" />
+      </geometry>
+    </collision>
   </link>
-  <joint name="L_elbow" type="fixed">
-    <origin xyz="0 -0.01 0.148" rpy="1.5708 -3.1415 1.5708" />
+  <joint name="L_elbow" type="revolute">
+    <origin xyz="0 -0.01 0.148" rpy="1.5708 -1.5708 1.5708" />
     <parent link="L_shoulder_yaw_link" />
     <child link="L_elbow_link" />
     <axis xyz="0 0 1" />
@@ -480,8 +498,8 @@
       </material>
     </visual>
   </link>
-  <joint name="R_shoulder_pitch" type="fixed">
-    <origin xyz="0 -0.14043 0.29123" rpy="-1.0 1.0 -2.6" />
+  <joint name="R_shoulder_pitch" type="revolute">
+    <origin xyz="0 -0.14043 0.29123" rpy="0 1.309 -1.5708" />
     <parent link="pelvis_link" />
     <child link="R_shoulder_pitch_link" />
     <axis xyz="0 0 1" />
@@ -502,8 +520,14 @@
         <color rgba="1 1 1 1" />
       </material>
     </visual>
+    <collision>
+      <origin xyz="0.07 0 0" rpy="0 1.57 0" />
+      <geometry>
+        <cylinder radius="0.04" length="0.08" />
+      </geometry>
+    </collision>
   </link>
-  <joint name="R_shoulder_roll" type="fixed">
+  <joint name="R_shoulder_roll" type="revolute">
     <origin xyz="0 0 0.0575" rpy="-1.5708 0.2618 0" />
     <parent link="R_shoulder_pitch_link" />
     <child link="R_shoulder_roll_link" />
@@ -525,8 +549,14 @@
         <color rgba="1 1 1 1" />
       </material>
     </visual>
+    <collision>
+      <origin xyz="0 0 0.07" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.04" length="0.1" />
+      </geometry>
+    </collision>
   </link>
-  <joint name="R_shoulder_yaw" type="fixed">
+  <joint name="R_shoulder_yaw" type="revolute">
     <origin xyz="0.112 0 0" rpy="1.5708 0 1.5708" />
     <parent link="R_shoulder_roll_link" />
     <child link="R_shoulder_yaw_link" />
@@ -548,9 +578,15 @@
         <color rgba="1 1 1 1" />
       </material>
     </visual>
+    <collision>
+      <origin xyz="0.22 0.012 0" rpy="0 1.57 0" />
+      <geometry>
+        <cylinder radius="0.03" length="0.35" />
+      </geometry>
+    </collision>
   </link>
-  <joint name="R_elbow" type="fixed">
-    <origin xyz="0 0.01 0.148" rpy="1.5708 0 1.5708" />
+  <joint name="R_elbow" type="revolute">
+    <origin xyz="0 0.01 0.148" rpy="1.5708 -1.5708 1.5708" />
     <parent link="R_shoulder_yaw_link" />
     <child link="R_elbow_link" />
     <axis xyz="0 0 -1" />

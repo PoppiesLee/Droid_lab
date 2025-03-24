@@ -5,6 +5,7 @@ import numpy as np
 from tqdm import tqdm
 import onnxruntime as ort
 from base.Base import NanoSleep
+from base.ArmBase import ArmBase
 from base.LegBase import LegBase
 from base.Base import set_joint_mode
 from tools.load_env_config import load_configuration
@@ -12,8 +13,8 @@ from tools.CircularBuffer import CircularBuffer
 
 onnx_mode_path = f"policies/policy.onnx"
 #                           0            1              2              3               4                5               6               7               8                 9                10             11
-IsaacLabJointOrder = ['L_hip_yaw',   'R_hip_yaw',  'L_hip_roll',   'R_hip_roll',   'L_hip_pitch',  'R_hip_pitch', 'L_knee_pitch', 'R_knee_pitch', 'L_ankle_pitch', 'R_ankle_pitch',  'L_ankle_roll', 'R_ankle_roll']
-MujocoJointOrder =   ['L_hip_yaw',  'L_hip_roll', 'L_hip_pitch', 'L_knee_pitch', 'L_ankle_pitch', 'L_ankle_roll',    'R_hip_yaw',   'R_hip_roll',   'R_hip_pitch',  'R_knee_pitch', 'R_ankle_pitch', 'R_ankle_roll']
+IsaacLabJointOrder = ['L_hip_yaw', 'L_shoulder_pitch', 'R_hip_yaw', 'R_shoulder_pitch', 'L_hip_roll', 'L_shoulder_roll', 'R_hip_roll', 'R_shoulder_roll', 'L_hip_pitch', 'L_shoulder_yaw', 'R_hip_pitch', 'R_shoulder_yaw', 'L_knee_pitch', 'L_elbow', 'R_knee_pitch', 'R_elbow', 'L_ankle_pitch', 'R_ankle_pitch', 'L_ankle_roll', 'R_ankle_roll']
+MujocoJointOrder =   ['L_hip_yaw', 'L_hip_roll', 'L_hip_pitch', 'L_knee_pitch', 'L_ankle_pitch', 'L_ankle_roll', 'R_hip_yaw', 'R_hip_roll', 'R_hip_pitch', 'R_knee_pitch', 'R_ankle_pitch', 'R_ankle_roll', 'L_shoulder_pitch', 'L_shoulder_roll', 'L_shoulder_yaw', 'L_elbow', 'R_shoulder_pitch', 'R_shoulder_roll', 'R_shoulder_yaw', 'R_elbow']
 # IsaacLab to Mujoco indices: [0, 6, 1, 7, 2, 8, 3, 9, 4, 10, 5, 11]
 # Mujoco to IsaacLab indices: [0, 2, 4, 6, 8, 10, 1, 3, 5, 7, 9, 11]
 # 找到 IsaacLabJointOrder 中每个关节在 MujocoJointOrder 中的索引
@@ -66,26 +67,30 @@ def quat_rotate_inverse(q: np.ndarray, v: np.ndarray) -> np.ndarray:
     return a - b + c
 
 
-class Sim2Real(LegBase):
+class Sim2Real(ArmBase, LegBase):
     def __init__(self):
-        super().__init__()
-        self.num_actions = 12
-        self.num_observations = 47
+        ArmBase.__init__(self)
+        LegBase.__init__(self)
+        self.num_actions = 20
+        self.num_observations = 71
         self.gait_frequency = 0
         self.cfg = load_configuration("policies/env_cfg.json", MujocoJointOrder)
         self.run_flag = True
         # joint target
         self.command = [0., 0., 0.]
-        self.target_q = np.zeros(self.legActions, dtype=np.double)
-        self.action = np.zeros(self.legActions, dtype=np.double)
+        self.target_q = np.zeros(self.num_actions, dtype=np.double)
+        self.action = np.zeros(self.num_actions, dtype=np.double)
         self.onnx_policy = ort.InferenceSession(onnx_mode_path)
         self.hist_obs = CircularBuffer(self.num_observations, self.cfg.hist_length)
-        set_joint_mode(self.legCommand, self.cfg, self.num_leg_actions)
+        set_joint_mode(self.legCommand, self.cfg, self.legActions)
 
     def init_robot(self):
-        self.set_leg_path(1, self.cfg.default_joints)
+        self.set_leg_path(1, self.cfg.default_joints[:self.legActions])
+        temp = self.cfg.default_joints[-self.armActions:]
+        self.set_arm_path(1,temp)
         timer = NanoSleep(self.cfg.decimation)  # 创建一个decimation毫秒的NanoSleep对象
         self.get_leg_state()
+        self.get_arm_state()
         temp_tic = self.legState.system_tic
         while self.legState.rc_keys[0] > 64:
             if self.legState.system_tic - temp_tic > 1000:
@@ -93,6 +98,7 @@ class Sim2Real(LegBase):
                 print("请将CH8急停左滑到底", self.legState.system_tic)
             start_time = time.perf_counter()
             self.get_leg_state()
+            self.get_arm_state()
             timer.waiting(start_time)
 
         print("单击CH6开始, CH8右滑到底急停")
@@ -105,8 +111,9 @@ class Sim2Real(LegBase):
             timer.waiting(start_time)
 
     def get_obs(self, gait_process):
-        q = np.array(self.legState.position)
-        dq = np.array(self.legState.velocity)
+        q = np.concatenate((self.legState.position, self.armState.position))
+        dq = np.concatenate((self.legState.velocity, self.armState.velocity))
+
         base_euler = np.array(self.legState.imu_euler)
         base_ang_vel = np.array(self.legState.imu_gyro)
 
@@ -127,9 +134,11 @@ class Sim2Real(LegBase):
         obs[6:9] = self.command
         obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
         obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
-        obs[11: 23] = q[Mujoco_to_Isaac_indices] - self.cfg.default_joints[Mujoco_to_Isaac_indices]
-        obs[23: 35] = dq[Mujoco_to_Isaac_indices]
-        obs[35: 47] = self.action[Mujoco_to_Isaac_indices]
+        obs[11: 31] = (q- self.cfg.default_joints)[Mujoco_to_Isaac_indices]
+        temp = dq[Mujoco_to_Isaac_indices]
+        temp2 = obs[31: 51]
+        obs[31: 51] = dq[Mujoco_to_Isaac_indices]
+        obs[51: 71] = self.action[Mujoco_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
         return q, dq, obs
 
@@ -174,7 +183,10 @@ class Sim2Real(LegBase):
             # self.target_q = self.leg_ref_trajectory(cnt_pd_loop)  # 参考轨迹可视化，需要将xml中的<freejoint/>注释掉，将机器人挂起来
             for idx in range(self.legActions):
                 self.legCommand.position[idx] = self.target_q[idx]
+            for idx in range(self.armActions):
+                self.armCommand.position[idx] = self.target_q[self.legActions + idx]
             self.set_leg_command()
+            self.set_arm_command()
             pbar.set_postfix(
                 realCycle=f"{self.legState.system_tic - pre_tic}ms",  # 实际循环周期，单位毫秒
                 calculateTime=f"{(time.perf_counter() - start_time) * 1000:.3f}ms",  # 计算用时，单位毫秒

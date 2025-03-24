@@ -16,8 +16,8 @@ MAX_LINE_VEL  = 1.5
 MAX_ANGLE_VEL = 0.5
 
 #                           0            1              2              3               4                5               6               7               8                 9                10             11
-IsaacLabJointOrder = ['L_hip_yaw',   'R_hip_yaw',  'L_hip_roll',   'R_hip_roll',   'L_hip_pitch',  'R_hip_pitch', 'L_knee_pitch', 'R_knee_pitch', 'L_ankle_pitch', 'R_ankle_pitch',  'L_ankle_roll', 'R_ankle_roll']
-MujocoJointOrder =   ['L_hip_yaw',  'L_hip_roll', 'L_hip_pitch', 'L_knee_pitch', 'L_ankle_pitch', 'L_ankle_roll',    'R_hip_yaw',   'R_hip_roll',   'R_hip_pitch',  'R_knee_pitch', 'R_ankle_pitch', 'R_ankle_roll']
+IsaacLabJointOrder = ['L_hip_yaw', 'L_shoulder_pitch', 'R_hip_yaw', 'R_shoulder_pitch', 'L_hip_roll', 'L_shoulder_roll', 'R_hip_roll', 'R_shoulder_roll', 'L_hip_pitch', 'L_shoulder_yaw', 'R_hip_pitch', 'R_shoulder_yaw', 'L_knee_pitch', 'L_elbow', 'R_knee_pitch', 'R_elbow', 'L_ankle_pitch', 'R_ankle_pitch', 'L_ankle_roll', 'R_ankle_roll']
+MujocoJointOrder =   ['L_hip_yaw', 'L_hip_roll', 'L_hip_pitch', 'L_knee_pitch', 'L_ankle_pitch', 'L_ankle_roll', 'R_hip_yaw', 'R_hip_roll', 'R_hip_pitch', 'R_knee_pitch', 'R_ankle_pitch', 'R_ankle_roll', 'L_shoulder_pitch', 'L_shoulder_roll', 'L_shoulder_yaw', 'L_elbow', 'R_shoulder_pitch', 'R_shoulder_roll', 'R_shoulder_yaw', 'R_elbow']
 # IsaacLab to Mujoco indices: [0, 6, 1, 7, 2, 8, 3, 9, 4, 10, 5, 11]
 # Mujoco to IsaacLab indices: [0, 2, 4, 6, 8, 10, 1, 3, 5, 7, 9, 11]
 # 找到 IsaacLabJointOrder 中每个关节在 MujocoJointOrder 中的索引
@@ -63,8 +63,8 @@ def get_command(last_value, current_value, max_increment):
 class Sim2Mujo():
     def __init__(self):
         self.gait_frequency = 0
-        self.num_actions = 12
-        self.num_observations = 47
+        self.num_actions = 20
+        self.num_observations = 71
         self.aoa_reader = AoaReader()
         self.aoa_reader.start_server()
         # joint target
@@ -109,7 +109,7 @@ class Sim2Mujo():
                 angle = get_command(self.command[2], angle, 0.01)
                 self.command[0] = min(distance, MAX_LINE_VEL)
                 self.command[2] = min(angle, MAX_ANGLE_VEL)
-        self.command = [0., 0., 0.]
+        self.command = [0.5, 0., 0.5]
         # 遥控器键值变步频处理
         if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
             self.gait_frequency = 0
@@ -122,9 +122,9 @@ class Sim2Mujo():
         obs[6:9] = self.command
         obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
         obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
-        obs[11: 23] = q[Mujoco_to_Isaac_indices] - self.cfg.default_joints[Mujoco_to_Isaac_indices]
-        obs[23: 35] = dq[Mujoco_to_Isaac_indices]
-        obs[35: 47] = self.action[Mujoco_to_Isaac_indices]
+        obs[11: 31] = (q- self.cfg.default_joints)[Mujoco_to_Isaac_indices]
+        obs[31: 51] = dq[Mujoco_to_Isaac_indices]
+        obs[51: 71] = self.action[Mujoco_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
         return q, dq, obs
 
