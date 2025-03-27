@@ -9,7 +9,7 @@ grpc_channel = '192.168.55.110'
 class LegBase:
     def __init__(self):
         print("Initializing LegBase")
-        self.legActions = 12
+        self.legActions = 10
         self.legConfigs = msg_pb2.DroidConfigs()
         self.legState = msg_pb2.DroidStateResponse()
         self.legCommand = msg_pb2.DroidCommandRequest()
@@ -64,8 +64,12 @@ class LegBase:
         dt0 = [0.] * self.legActions  # 假设 NMC 是一个定义好的常量，表示关节数量
         D2R = math.pi / 180.0
         # 填充 dt1 和 dt2 列表
-        dt1 = [0, 0, 30 * D2R, -60 * D2R, 30 * D2R, -0.3, 0, 0, 0, 0, 0, 0.3]
-        dt2 = [0, 0, 0, 0, 0, 0.3, 0, 0, 30 * D2R, -60 * D2R, 30 * D2R, -0.3]
+        if self.legActions == 10:
+            dt1 = [0, 0, 30 * D2R, -60 * D2R, 30 * D2R, 0, 0, 0, 0, 0]
+            dt2 = [0, 0, 0, 0, 0, 0, 0, 30 * D2R, -60 * D2R, 30 * D2R]
+        elif self.legActions == 12:
+            dt1 = [0, 0, 30 * D2R, -60 * D2R, 30 * D2R, -0.3, 0, 0, 0, 0, 0, 0.3]
+            dt2 = [0, 0, 0, 0, 0, 0.3, 0, 0, 30 * D2R, -60 * D2R, 30 * D2R, -0.3]
 
         # 执行关节规划
         for i in range(2):

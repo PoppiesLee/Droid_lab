@@ -1,4 +1,21 @@
 # Deploy 使用说明
+更新策略
+```
+scp deploy/policies/policy.onnx root@192.168.55.110:/home/x02lite/deploy/policies/policy.onnx
+```
+
+## 主机端配置(ubuntu22.04,python3.10)
+下载最新的: [rknn-toolkit2](https://github.com/rockchip-linux/rknn-toolkit2/releases)
+
+进入conda环境，例如：
+```
+conda activate legged_lab
+```
+安装rknn-toolkit2
+```
+pip install rknn_toolkit2-1.6.0+81f21f
+4d-cp310-cp310-linux_x86_64.whl -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
 ## 安装miniconda
 ### 登录到机器人终端，配置文件权限
 ```
