@@ -1,16 +1,14 @@
-import math
 import copy
-import torch
 import mujoco
 import mujoco_viewer
 import numpy as np
 from tqdm import tqdm
 import onnxruntime as ort
-from tools.load_env_config import load_configuration
+from deploy.tools.load_env_config import load_configuration
 from deploy.tools.CircularBuffer import CircularBuffer
 
-onnx_mode_path = f"policies/policy.onnx"
-mujoco_model_path = f"../legged_lab/assets/droid/x2r10/scene.xml"
+onnx_mode_path = f"deploy/policies/policy.onnx"
+mujoco_model_path = f"legged_lab/assets/droid/x2r10/scene.xml"
 MAX_LINE_VEL  = 1.5
 MAX_ANGLE_VEL = 0.5
 
@@ -70,7 +68,7 @@ class Sim2Mujo():
         self.onnx_policy = ort.InferenceSession(onnx_mode_path)
         self.model = mujoco.MjModel.from_xml_path(filename=mujoco_model_path)
         actuators = self.get_joint_names()
-        self.cfg = load_configuration("policies/env_cfg.json", actuators)
+        self.cfg = load_configuration("deploy/policies/env_cfg.json", actuators)
         self.hist_obs = CircularBuffer(self.num_observations, self.cfg.hist_length)
         self.model.opt.timestep = self.cfg.dt
         self.data = mujoco.MjData(self.model)

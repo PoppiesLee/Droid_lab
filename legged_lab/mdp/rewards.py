@@ -136,9 +136,3 @@ def feet_swing(env: BaseEnv, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
     contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
     feet_contact = contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, 2] > 3
     return (left_swing & ~feet_contact[:, 0]).float() + (right_swing & ~feet_contact[:, 1]).float()
-
-# def feet_contact_error(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
-#     contact_sensor: ContactSensor = env.scene[sensor_cfg.name]
-#     contact = contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, 2] > 5
-#     stance_mask = env.contact_phase()
-#     return torch.mean(torch.where(contact == stance_mask, 1, -0.3), dim=1)
