@@ -137,3 +137,5 @@ if __name__ == "__main__":
 
 # # python convert_urdf.py --merge-joints ./x03/x03walk.urdf ./x03/x03.usd
 # # python convert_urdf.py --merge-joints ./droid/x02a/x02a.urdf ./droid/x02a/x02a.usd
+# # python convert_urdf.py --merge-joints ./droid/x2r10/x2r10.urdf ./droid/x2r10/x2r10.usd
+# # python convert_urdf.py --merge-joints ./droid/x2rw10/x2rw10.urdf ./droid/x2rw10/x2rw10.usd

@@ -29,9 +29,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="-0.005 0 0.3" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/pelvis_link.STL" />
+        <box size="0.25 0.3 0.4" />
       </geometry>
     </collision>
   </link>
@@ -50,12 +50,6 @@
         <color rgba="1 1 1 1" />
       </material>
     </visual>
-    <!-- <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-        <mesh filename="meshes/L_hip_yaw_link.STL" />
-      </geometry>
-    </collision> -->
   </link>
   <joint name="L_hip_yaw" type="revolute">
     <origin xyz="0 0 0" rpy="0 0 0" />
@@ -79,12 +73,6 @@
         <color rgba="1 1 1 1" />
       </material>
     </visual>
-    <!-- <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-        <mesh filename="meshes/L_hip_roll_link.STL" />
-      </geometry>
-    </collision> -->
   </link>
   <joint name="L_hip_roll" type="revolute">
     <origin xyz="-0.0095 0.14 0" rpy="0 0 0" />
@@ -109,9 +97,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 -0.22" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/L_hip_pitch_link.STL" />
+        <cylinder radius="0.07" length="0.25" />
       </geometry>
     </collision>
   </link>
@@ -138,9 +126,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 -0.2" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/L_knee_pitch_link.STL" />
+        <cylinder radius="0.05" length="0.2" />
       </geometry>
     </collision>
   </link>
@@ -168,39 +156,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="-0.14 0.00 -0.085" rpy="0 0 0"/>
+      <origin xyz="0.015 0 -0.085" rpy="0 -0.02 0" />
       <geometry>
-        <sphere radius="0.005"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.080 0.045 -0.087" rpy="0 0 0"/>
-      <geometry>
-        <sphere radius="0.005"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.080 -0.045 -0.087" rpy="0 0 0"/>
-      <geometry>
-        <sphere radius="0.005"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.090 0.050 -0.087" rpy="0 0 0"/>
-      <geometry>
-        <sphere radius="0.005"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.090 -0.050 -0.087" rpy="0 0 0"/>
-      <geometry>
-        <sphere radius="0.005"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.150 -0.00 -0.087" rpy="0 0 0"/>
-      <geometry>
-        <sphere radius="0.005"/>
+        <box size="0.29 0.09 0.025" />
       </geometry>
     </collision>
   </link>
@@ -285,9 +243,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 -0.22" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/R_hip_pitch_link.STL" />
+        <cylinder radius="0.07" length="0.25" />
       </geometry>
     </collision>
   </link>
@@ -314,9 +272,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 -0.2" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/R_knee_pitch_link.STL" />
+        <cylinder radius="0.05" length="0.2" />
       </geometry>
     </collision>
   </link>
@@ -344,39 +302,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="-0.14 0.00 -0.085" rpy="0 0 0"/>
+      <origin xyz="0.015 0 -0.085" rpy="0 -0.02 0" />
       <geometry>
-        <sphere radius="0.005"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.080 0.045 -0.087" rpy="0 0 0"/>
-      <geometry>
-        <sphere radius="0.005"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.080 -0.045 -0.087" rpy="0 0 0"/>
-      <geometry>
-        <sphere radius="0.005"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.090 0.050 -0.087" rpy="0 0 0"/>
-      <geometry>
-        <sphere radius="0.005"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.090 -0.050 -0.087" rpy="0 0 0"/>
-      <geometry>
-        <sphere radius="0.005"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.150 -0.00 -0.087" rpy="0 0 0"/>
-      <geometry>
-        <sphere radius="0.005"/>
+        <box size="0.29 0.09 0.025" />
       </geometry>
     </collision>
   </link>
@@ -402,12 +330,6 @@
         <color rgba="1 1 1 1" />
       </material>
     </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-        <mesh filename="meshes/waist_yaw_link.STL" />
-      </geometry>
-    </collision>
   </link>
   <joint name="waist_yaw" type="fixed">
     <origin xyz="0 0 0.08375" rpy="0 0 0" />
@@ -431,12 +353,6 @@
         <color rgba="0.823529411764706 0.823529411764706 0.823529411764706 1" />
       </material>
     </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-        <mesh filename="meshes/torso_link.STL" />
-      </geometry>
-    </collision>
   </link>
   <joint name="torso" type="fixed">
     <origin xyz="0 0 0.03675" rpy="0 0 0" />
@@ -459,12 +375,6 @@
         <color rgba="1 0 0 1" />
       </material>
     </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-        <mesh filename="meshes/logo_link.STL" />
-      </geometry>
-    </collision>
   </link>
   <joint name="logo" type="fixed">
     <origin xyz="0 0 0" rpy="0 0 0" />
@@ -488,9 +398,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.03 0 0.17" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/head_link.STL" />
+        <sphere radius="0.12" />
       </geometry>
     </collision>
   </link>
@@ -516,12 +426,6 @@
         <color rgba="1 1 1 1" />
       </material>
     </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-        <mesh filename="meshes/L_shoulder_pitch_link.STL" />
-      </geometry>
-    </collision>
   </link>
   <joint name="L_shoulder_pitch" type="fixed">
     <origin xyz="-0.01 0.14477 0.31534" rpy="0.17453 0 0" />
@@ -546,9 +450,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0" rpy="0 1.57 0" />
       <geometry>
-        <mesh filename="meshes/L_shoulder_roll_link.STL" />
+        <cylinder radius="0.04" length="0.08" />
       </geometry>
     </collision>
   </link>
@@ -575,9 +479,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.01 0 -0.17" rpy="1.57 0 0" />
       <geometry>
-        <mesh filename="meshes/L_shoulder_yaw_link.STL" />
+        <cylinder radius="0.04" length="0.08" />
       </geometry>
     </collision>
   </link>
@@ -604,9 +508,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="-0.013 0 -0.28" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/L_elbow_pitch_link.STL" />
+        <sphere radius="0.038" />
       </geometry>
     </collision>
   </link>
@@ -632,12 +536,6 @@
         <color rgba="1 1 1 1" />
       </material>
     </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-        <mesh filename="meshes/R_shoulder_pitch_link.STL" />
-      </geometry>
-    </collision>
   </link>
   <joint name="R_shoulder_pitch" type="fixed">
     <origin xyz="-0.01 -0.14477 0.31534" rpy="-0.17453 0 0" />
@@ -662,9 +560,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0" rpy="0 1.57 0" />
       <geometry>
-        <mesh filename="meshes/R_shoulder_roll_link.STL" />
+        <cylinder radius="0.04" length="0.08" />
       </geometry>
     </collision>
   </link>
@@ -691,9 +589,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.01 0 -0.17" rpy="1.57 0 0" />
       <geometry>
-        <mesh filename="meshes/R_shoulder_yaw_link.STL" />
+        <cylinder radius="0.04" length="0.08" />
       </geometry>
     </collision>
   </link>
@@ -720,9 +618,9 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="-0.013 0 -0.28" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/R_elbow_pitch_link.STL" />
+        <sphere radius="0.038" />
       </geometry>
     </collision>
   </link>

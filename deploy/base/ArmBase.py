@@ -2,8 +2,8 @@ import math
 from Base import *
 from deploy.policies.Config import Config
 from grpc import insecure_channel
-from deploy.protos import arm_service_pb2_grpc as arm_pb2_grpc
-from deploy.protos import droid_msg_pb2 as msg_pb2
+from ..protos import arm_service_pb2_grpc as arm_pb2_grpc
+from ..protos import droid_msg_pb2 as msg_pb2
 
 
 class ArmBase:

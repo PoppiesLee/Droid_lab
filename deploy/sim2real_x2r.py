@@ -112,7 +112,7 @@ class Sim2Real(LegBase):
         eq = euler_to_quaternion(base_euler[0], base_euler[1], base_euler[2])
         eq = np.array(eq, dtype=np.double)
         project_gravity = quat_rotate_inverse(eq, np.array([0., 0., -1]))
-        self.command = [self.legState.rc_du[0], self.legState.rc_du[1] * 0.5, -self.legState.rc_du[3] * 0.5]
+        self.command = [self.legState.rc_du[0] * 2, self.legState.rc_du[1] * 0.5, -self.legState.rc_du[3] * 0.8]
         # 遥控器键值变步频处理
         if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
             self.gait_frequency = 0
@@ -143,7 +143,7 @@ class Sim2Real(LegBase):
         duration_second = self.cfg.decimation * self.cfg.dt  # 单位:s
         duration_millisecond = duration_second * 1000  # 单位：ms
         timer = NanoSleep(duration_millisecond)  # 创建一个decimation毫秒的NanoSleep对象
-        pbar = tqdm(range(int(500 / duration_second)),
+        pbar = tqdm(range(int(0xfffffff0 / duration_second)),
                     desc="x02 running...")  # x * 0.001, ms -> s
         start = time.perf_counter()
         for _ in pbar:

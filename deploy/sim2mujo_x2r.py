@@ -1,14 +1,19 @@
+import os
 import copy
 import mujoco
 import mujoco_viewer
 import numpy as np
 from tqdm import tqdm
 import onnxruntime as ort
-from deploy.tools.load_env_config import load_configuration
-from deploy.tools.CircularBuffer import CircularBuffer
+from deploy import DEPLOY_FOLDER_DIR
+from tools.load_env_config import load_configuration
+from tools.CircularBuffer import CircularBuffer
 
-onnx_mode_path = f"deploy/policies/policy.onnx"
-mujoco_model_path = f"legged_lab/assets/droid/x2r10/scene.xml"
+
+onnx_mode_path = os.path.join(DEPLOY_FOLDER_DIR, f"policies/policy.onnx")
+env_config_path = os.path.join(DEPLOY_FOLDER_DIR, f"policies/env_cfg.json")
+mujoco_model_path = os.path.join(DEPLOY_FOLDER_DIR, f"../legged_lab/assets/droid/x2r10/scene.xml")
+
 MAX_LINE_VEL  = 1.5
 MAX_ANGLE_VEL = 0.5
 
@@ -68,7 +73,7 @@ class Sim2Mujo():
         self.onnx_policy = ort.InferenceSession(onnx_mode_path)
         self.model = mujoco.MjModel.from_xml_path(filename=mujoco_model_path)
         actuators = self.get_joint_names()
-        self.cfg = load_configuration("deploy/policies/env_cfg.json", actuators)
+        self.cfg = load_configuration(env_config_path, actuators)
         self.hist_obs = CircularBuffer(self.num_observations, self.cfg.hist_length)
         self.model.opt.timestep = self.cfg.dt
         self.data = mujoco.MjData(self.model)
@@ -131,7 +136,7 @@ class Sim2Mujo():
         gait_process = 0
         self.cnt_pd_loop = 0
         duration_second = self.cfg.decimation * self.cfg.dt  # 单位:s
-        for _ in tqdm(range(int(5000 / duration_second)), desc="Simulating..."):
+        for _ in tqdm(range(int(0xfffffff0 / duration_second)), desc="Simulating..."):
             # Obtain an observation
 
             # 1000hz -> 100hz

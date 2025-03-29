@@ -10,7 +10,7 @@ ExecStart=/home/x02lite/deploy/script/deploy_rl.sh
 ExecStop=/usr/bin/kill -9 $MAINPID
 StandardOutput=null
 TimeoutStopSec=1
-User=x02lite
+User=root
 
 [Install]
 WantedBy=multi-user.target
