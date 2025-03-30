@@ -168,9 +168,9 @@ X2R_CFG = ArticulationCfg(
         joint_pos={
             ".*_hip_yaw": 0.0,
             ".*_hip_roll": 0.05,
-            ".*_hip_pitch": 0.2,
-            ".*_knee_pitch": -0.42,
-            ".*_ankle_pitch": 0.23,
+            ".*_hip_pitch": 0.0873,
+            ".*_knee_pitch": -0.1745,
+            ".*_ankle_pitch": 0.0873,
         },
         joint_vel={".*": 0.0},
     ),
