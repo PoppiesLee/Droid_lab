@@ -36,6 +36,47 @@ def quaternion_to_euler_array(quat):
     # Returns roll, pitch, yaw in a NumPy array in radians
     return np.array([roll_x, pitch_y,yaw_z])  # , yaw_z
 
+def euler_to_quaternion(roll, pitch, yaw):
+    """
+    Convert Euler angles (roll, pitch, yaw) to a quaternion (w, x, y, z).
+    :param roll: Rotation around X-axis (in radians)
+    :param pitch: Rotation around Y-axis (in radians)
+    :param yaw: Rotation around Z-axis (in radians)
+    :return: Quaternion as a tuple (w, x, y, z)
+    """
+    # Compute half angles
+    cy = np.cos(yaw * 0.5)
+    sy = np.sin(yaw * 0.5)
+    cp = np.cos(pitch * 0.5)
+    sp = np.sin(pitch * 0.5)
+    cr = np.cos(roll * 0.5)
+    sr = np.sin(roll * 0.5)
+
+    # Calculate quaternion components
+    w = cr * cp * cy + sr * sp * sy
+    x = sr * cp * cy - cr * sp * sy
+    y = cr * sp * cy + sr * cp * sy
+    z = cr * cp * sy - sr * sp * cy
+
+    return [w, x, y, z]
+
+def quat_rotate_inverse(q: np.ndarray, v: np.ndarray) -> np.ndarray:
+    """Rotate a vector by the inverse of a quaternion along the last dimension of q and v.
+
+    Args:
+        q: The quaternion in (w, x, y, z). Shape is (4,).
+        v: The vector in (x, y, z). Shape is (3,).
+
+    Returns:
+        The rotated vector in (x, y, z). Shape is (3,).
+    """
+    v = np.array(v)
+    q_w = q[0]
+    q_vec = q[1:]
+    a = v * (2.0 * q_w ** 2 - 1.0)
+    b = np.cross(q_vec, v) * q_w * 2.0
+    c = q_vec * np.dot(q_vec, v) * 2.0
+    return a - b + c
 
 def init_command(command, num_actions):
     for idx in range(num_actions):

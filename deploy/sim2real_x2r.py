@@ -3,11 +3,15 @@ import time
 import numpy as np
 from tqdm import tqdm
 import onnxruntime as ort
-from base.Base import NanoSleep
 from base.LegBase import LegBase
 from base.Base import set_joint_mode
-from tools.load_env_config import load_configuration
 from tools.CircularBuffer import CircularBuffer
+from tools.load_env_config import load_configuration
+from base.Base import NanoSleep, euler_to_quaternion, quat_rotate_inverse
+
+from tools.aoa_ctrl import AoaReader
+MAX_LINE_VEL  = 1.5
+MAX_ANGLE_VEL = 0.8
 
 onnx_mode_path = f"policies/policy.onnx"
 #                           0            1            2              3               4                5               6            7            8              9
@@ -20,47 +24,23 @@ Isaac_to_Mujoco_indices = [IsaacLabJointOrder.index(joint) for joint in MujocoJo
 print("Mujoco to IsaacLab indices:", Mujoco_to_Isaac_indices)
 print("IsaacLab to Mujoco indices:", Isaac_to_Mujoco_indices)
 
-def euler_to_quaternion(roll, pitch, yaw):
+def get_command(last_value, current_value, max_increment):
     """
-    Convert Euler angles (roll, pitch, yaw) to a quaternion (w, x, y, z).
-    :param roll: Rotation around X-axis (in radians)
-    :param pitch: Rotation around Y-axis (in radians)
-    :param yaw: Rotation around Z-axis (in radians)
-    :return: Quaternion as a tuple (w, x, y, z)
+    返回一个值，该值满足最大增量限制。
+
+    :param last_value: 上一个值
+    :param current_value: 当前值
+    :param max_increment: 最大增量
+    :return: 限制后的值
     """
-    # Compute half angles
-    cy = np.cos(yaw * 0.5)
-    sy = np.sin(yaw * 0.5)
-    cp = np.cos(pitch * 0.5)
-    sp = np.sin(pitch * 0.5)
-    cr = np.cos(roll * 0.5)
-    sr = np.sin(roll * 0.5)
-
-    # Calculate quaternion components
-    w = cr * cp * cy + sr * sp * sy
-    x = sr * cp * cy - cr * sp * sy
-    y = cr * sp * cy + sr * cp * sy
-    z = cr * cp * sy - sr * sp * cy
-
-    return [w, x, y, z]
-
-def quat_rotate_inverse(q: np.ndarray, v: np.ndarray) -> np.ndarray:
-    """Rotate a vector by the inverse of a quaternion along the last dimension of q and v.
-
-    Args:
-        q: The quaternion in (w, x, y, z). Shape is (4,).
-        v: The vector in (x, y, z). Shape is (3,).
-
-    Returns:
-        The rotated vector in (x, y, z). Shape is (3,).
-    """
-    v = np.array(v)
-    q_w = q[0]
-    q_vec = q[1:]
-    a = v * (2.0 * q_w ** 2 - 1.0)
-    b = np.cross(q_vec, v) * q_w * 2.0
-    c = q_vec * np.dot(q_vec, v) * 2.0
-    return a - b + c
+    # 计算当前值与上一个值之间的差值
+    increment = current_value - last_value
+    # 如果差值的绝对值超过了最大增量，则限制它
+    if abs(increment) > max_increment:
+        # 如果差值为正，则增加最大增量；如果差值为负，则减少最大增量
+        return last_value + (max_increment if increment > 0 else -max_increment)
+    # 如果差值在允许范围内，则直接返回当前值
+    return current_value
 
 
 class Sim2Real(LegBase):
@@ -71,6 +51,8 @@ class Sim2Real(LegBase):
         self.gait_frequency = 0
         self.cfg = load_configuration("policies/env_cfg.json", MujocoJointOrder)
         self.run_flag = True
+        self.aoa_reader = AoaReader()
+        self.aoa_reader.start_server()
         # joint target
         self.command = [0., 0., 0.]
         self.target_q = np.zeros(self.num_actions, dtype=np.double)
@@ -101,6 +83,23 @@ class Sim2Real(LegBase):
                 exit()
             timer.waiting(start_time)
 
+    def update_rc_command(self):
+        if (self.legState.rc_keys[1] == 0) and (self.legState.rc_keys[2] == 0):
+            if self.aoa_reader.result_event.is_set():  # 检查是否有新的结果
+                self.aoa_reader.result_event.clear()  # 清除事件
+                if self.aoa_reader.result['nodes']:
+                    distance = self.aoa_reader.result['nodes'][0]['dis'] - 0.5
+                    angle = self.aoa_reader.result['nodes'][0]['angle'] * math.pi / 90.0
+                    distance = get_command(self.command[0], distance, 0.5)
+                    angle = get_command(self.command[2], angle, 0.5)
+                    self.command[0] = min(distance, MAX_LINE_VEL)
+                    self.command[2] = min(angle, MAX_ANGLE_VEL)
+                # print("aoa command: ", self.command)
+        else:
+            self.command = [self.legState.rc_du[0] * 2, self.legState.rc_du[1] * 0.5, -self.legState.rc_du[3] * 0.8]
+            # print("t8s command: ", self.command)
+
+
     def get_obs(self, gait_process):
         q = np.array(self.legState.position)
         dq = np.array(self.legState.velocity)
@@ -112,7 +111,7 @@ class Sim2Real(LegBase):
         eq = euler_to_quaternion(base_euler[0], base_euler[1], base_euler[2])
         eq = np.array(eq, dtype=np.double)
         project_gravity = quat_rotate_inverse(eq, np.array([0., 0., -1]))
-        self.command = [self.legState.rc_du[0] * 2, self.legState.rc_du[1] * 0.5, -self.legState.rc_du[3] * 0.8]
+        self.update_rc_command()
         # 遥控器键值变步频处理
         if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
             self.gait_frequency = 0
