@@ -1,1 +1,0 @@
-from legged_lab.assets.fftai.fftai import *

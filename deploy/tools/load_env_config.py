@@ -90,8 +90,8 @@ def load_configuration(file: os.PathLike, mujoco_joint_order) -> IsaacLabCfg:
                 regex = re.compile(temp_name)
                 set_matching(joint_kp, regex, actuators[group]["stiffness"][temp_name])
                 set_matching(joint_kd, regex, actuators[group]["damping"][temp_name])
-                set_matching(effort_limit, regex, actuators[group]["effort_limit"][temp_name])
-                set_matching(velocity_limit, regex, actuators[group]["velocity_limit"][temp_name])
+                set_matching(effort_limit, regex, actuators[group]["effort_limit_sim"][temp_name])
+                set_matching(velocity_limit, regex, actuators[group]["velocity_limit_sim"][temp_name])
                 set_matching(armature, regex, actuators[group]["armature"][temp_name])
                 set_matching(friction, regex, actuators[group]["friction"])
 
