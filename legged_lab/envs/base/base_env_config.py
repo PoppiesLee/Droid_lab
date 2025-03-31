@@ -11,6 +11,7 @@ from .base_config import BaseSceneCfg, HeightScannerCfg, RobotCfg, RewardCfg, \
 class BaseEnvCfg:
     device: str = "cuda:0"
     scene: BaseSceneCfg = BaseSceneCfg(
+        seed=42,
         max_episode_length_s=20.0,
         num_envs=4096,
         env_spacing=2.5,
@@ -23,7 +24,8 @@ class BaseEnvCfg:
             prim_body_name=MISSING,
             resolution=0.1,
             size=(1.6, 1.0),
-            debug_vis=False
+            debug_vis=False,
+            drift_range=(-0.3, 0.3)
         )
     )
     robot: RobotCfg = RobotCfg(
@@ -50,9 +52,9 @@ class BaseEnvCfg:
         height_scan_offset=0.5
     )
     commands: CommandsCfg = CommandsCfg(
-        resampling_time_range=(10.0, 10.0),
-        rel_standing_envs=0.2,
-        rel_heading_envs=1.0,
+        resampling_time_range=(5.0, 10.0),
+        rel_standing_envs=0.1,
+        rel_heading_envs=0.,
         heading_command=True,
         heading_control_stiffness=0.5,
         debug_vis=True,
@@ -69,7 +71,7 @@ class BaseEnvCfg:
         noise_scales=NoiseScalesCfg(
             ang_vel=0.5,
             projected_gravity=0.05,
-            joint_pos=0.01,
+            joint_pos=0.05,
             joint_vel=1.5,
             height_scan=0.1,
         )
@@ -108,13 +110,13 @@ class BaseEnvCfg:
             enable=True,
             params={
                 "body_names": MISSING,
-                "mass_distribution_params": (-5.0, 5.0),
+                "mass_distribution_params": (5.0, -5.0),
                 "operation": "add",
             }
         ),
         push_robot=PushRobotCfg(
             enable=True,
-            push_interval_s=15.0,
+            push_interval_s=7.0,
             params={"velocity_range": {"x": (-1.0, 1.0), "y": (-1.0, 1.0)}}
 
         ),
@@ -139,7 +141,7 @@ class BaseEnvCfg:
 class BaseAgentCfg:
     resume: bool = False
     num_steps_per_env: int = 24
-    max_iterations: int = 10000
+    max_iterations: int = 50000
     save_interval: int = 100
     experiment_name: str = MISSING
     empirical_normalization: bool = False

@@ -27,7 +27,6 @@ simulation_app = app_launcher.app
 
 from isaaclab_rl.rsl_rl import export_policy_as_jit, export_policy_as_onnx
 
-import isaacsim.core.utils.torch as torch_utils
 from legged_lab.envs import *  # noqa:F401, F403
 from legged_lab.utils.cli_args import update_rsl_rl_cfg
 from isaaclab_tasks.utils import get_checkpoint_path
@@ -48,6 +47,7 @@ def play():
     env_cfg.commands.ranges.lin_vel_x = (0.6, 0.6)
     env_cfg.commands.ranges.lin_vel_y = (0.0, 0.0)
     env_cfg.commands.ranges.heading = (0.0, 0.0)
+    # env_cfg.scene.height_scanner.drift_range = (0.0, 0.0)
 
     # env_cfg.scene.terrain_generator = None
     # env_cfg.scene.terrain_type = "plane"
@@ -77,12 +77,8 @@ def play():
     policy = runner.get_inference_policy(device=env.device)
 
     export_model_dir = os.path.join(os.path.dirname(resume_path), "exported")
-    export_policy_as_jit(
-        runner.alg.actor_critic, runner.obs_normalizer, path=export_model_dir, filename="policy.pt"
-    )
-    export_policy_as_onnx(
-        runner.alg.actor_critic, normalizer=runner.obs_normalizer, path=export_model_dir, filename="policy.onnx"
-    )
+    export_policy_as_jit(runner.alg.policy, runner.obs_normalizer, path=export_model_dir, filename="policy.pt")
+    export_policy_as_onnx(runner.alg.policy, normalizer=runner.obs_normalizer, path=export_model_dir, filename="policy.onnx")
     # 去掉路径末尾的斜杠（如果存在）
     temp_path = export_model_dir.rstrip("/")
     # 去掉路径中的最后一部分

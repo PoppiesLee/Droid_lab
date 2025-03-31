@@ -17,10 +17,12 @@ class HeightScannerCfg:
     resolution: float = 0.1
     size: tuple = (1.6, 1.0)
     debug_vis: bool = False
+    drift_range: tuple = (0.0, 0.0)
 
 
 @configclass
 class BaseSceneCfg:
+    seed: int = 42
     max_episode_length_s: float = 20.0
     num_envs: int = 4096
     env_spacing: float = 2.5

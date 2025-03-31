@@ -13,6 +13,7 @@ from isaaclab.envs.mdp.commands import UniformVelocityCommand, UniformVelocityCo
 from isaaclab.envs.mdp.events import randomize_rigid_body_material, randomize_rigid_body_mass, reset_joints_by_scale, reset_root_state_uniform, push_by_setting_velocity
 from isaaclab.managers import RewardManager
 from isaaclab.utils.buffers import CircularBuffer, DelayBuffer
+import isaacsim.core.utils.torch as torch_utils
 from isaacsim.core.utils.torch.maths import torch_rand_float
 
 
@@ -26,6 +27,7 @@ class BaseEnv(VecEnv):
         self.physics_dt = self.cfg.sim.dt
         self.step_dt = self.cfg.sim.decimation * self.cfg.sim.dt
         self.num_envs = self.cfg.scene.num_envs
+        self.seed(cfg.scene.seed)
 
         sim_cfg = sim_utils.SimulationCfg(
             device=cfg.device,
@@ -76,7 +78,7 @@ class BaseEnv(VecEnv):
             ranges=self.cfg.commands.ranges,
         )
         self.command_generator = UniformVelocityCommand(cfg=command_cfg, env=self)
-        self.reward_maneger = RewardManager(self.cfg.reward, self)
+        self.reward_manager = RewardManager(self.cfg.reward, self)
 
         self.init_buffers()
 
@@ -153,21 +155,21 @@ class BaseEnv(VecEnv):
         if self.add_noise:
             current_actor_obs += (2 * torch.rand_like(current_actor_obs) - 1) * self.noise_scale_vec
 
-        current_actor_obs = torch.clip(current_actor_obs, -self.clip_obs, self.clip_obs)
-        current_critic_obs = torch.clip(current_critic_obs, -self.clip_obs, self.clip_obs)
-
         self.actor_obs_buffer.append(current_actor_obs)
         self.critic_obs_buffer.append(current_critic_obs)
 
         actor_obs = self.actor_obs_buffer.buffer.reshape(self.num_envs, -1)
         critic_obs = self.critic_obs_buffer.buffer.reshape(self.num_envs, -1)
         if self.cfg.scene.height_scanner.enable_height_scan:
-            height_scan = (self.height_scanner.data.pos_w[:, 2].unsqueeze(1) - self.height_scanner.data.ray_hits_w[..., 2] - self.cfg.normalization.height_scan_offset)
+            height_scan = (self.height_scanner.data.pos_w[:, 2].unsqueeze(1) - self.height_scanner.data.ray_hits_w[..., 2] - self.cfg.normalization.height_scan_offset) * self.obs_scales.height_scan
+            critic_obs = torch.cat([critic_obs, height_scan], dim=-1)
             if self.add_noise:
                 height_scan += (2 * torch.rand_like(height_scan) - 1) * self.height_scan_noise_vec
-            height_scan = torch.clip(height_scan, -self.clip_obs, self.clip_obs) * self.obs_scales.height_scan
             actor_obs = torch.cat([actor_obs, height_scan], dim=-1)
-            critic_obs = torch.cat([critic_obs, height_scan], dim=-1)
+
+        actor_obs = torch.clip(actor_obs, -self.clip_obs, self.clip_obs)
+        critic_obs = torch.clip(critic_obs, -self.clip_obs, self.clip_obs)
+
         return actor_obs, critic_obs
 
     def reset(self, env_ids):
@@ -184,7 +186,7 @@ class BaseEnv(VecEnv):
         reset_joints_by_scale(env=self, env_ids=env_ids, position_range=self.cfg.domain_rand.reset_robot_joints.params["position_range"], velocity_range=self.cfg.domain_rand.reset_robot_joints.params["velocity_range"], asset_cfg=self.robot_cfg)
         reset_root_state_uniform(env=self, env_ids=env_ids, pose_range=self.cfg.domain_rand.reset_robot_base.params["pose_range"], velocity_range=self.cfg.domain_rand.reset_robot_base.params["velocity_range"], asset_cfg=self.robot_cfg)
 
-        reward_extras = self.reward_maneger.reset(env_ids)
+        reward_extras = self.reward_manager.reset(env_ids)
         self.extras['log'].update(reward_extras)
         self.extras["time_outs"] = self.time_out_buf
 
@@ -193,6 +195,9 @@ class BaseEnv(VecEnv):
         self.critic_obs_buffer.reset(env_ids)
         self.action_buffer.reset(env_ids)
         self.episode_length_buf[env_ids] = 0
+
+        self.scene.write_data_to_sim()
+        self.sim.forward()
 
     def step(self, actions: torch.Tensor):
 
@@ -213,8 +218,8 @@ class BaseEnv(VecEnv):
         self.episode_length_buf += 1
         self.post_step_callback()
 
-        self.check_reset()
-        reward_buf = self.reward_maneger.compute(self.step_dt)
+        self.reset_buf, self.time_out_buf = self.check_reset()
+        reward_buf = self.reward_manager.compute(self.step_dt)
         env_ids = self.reset_buf.nonzero(as_tuple=False).flatten()
         self.reset(env_ids)
         self.gait_frequency[env_ids] = torch_rand_float(1.0, 2.0, (len(env_ids), 1), device=self.device).squeeze(1)
@@ -237,9 +242,10 @@ class BaseEnv(VecEnv):
     def check_reset(self):
         net_contact_forces = self.contact_sensor.data.net_forces_w_history
 
-        self.reset_buf = torch.any(torch.max(torch.norm(net_contact_forces[:, :, self.termination_contact_cfg.body_ids], dim=-1,), dim=1,)[0] > 1.0, dim=1)
-        self.time_out_buf = self.episode_length_buf >= self.max_episode_length
-        self.reset_buf |= self.time_out_buf
+        reset_buf = torch.any(torch.max(torch.norm(net_contact_forces[:, :, self.termination_contact_cfg.body_ids], dim=-1,), dim=1,)[0] > 1.0, dim=1)
+        time_out_buf = self.episode_length_buf >= self.max_episode_length
+        reset_buf |= time_out_buf
+        return reset_buf, time_out_buf
 
     def apply_domain_random_at_start(self, env_ids):
         if self.cfg.domain_rand.randomize_robot_friction.enable:
@@ -303,3 +309,12 @@ class BaseEnv(VecEnv):
         actor_obs, critic_obs = self.compute_observations()
         self.extras["observations"] = {"critic": critic_obs}
         return actor_obs, self.extras
+
+    @staticmethod
+    def seed(seed: int = -1) -> int:
+        try:
+            import omni.replicator.core as rep
+            rep.set_global_seed(seed)
+        except ModuleNotFoundError:
+            pass
+        return torch_utils.set_seed(seed)

@@ -2,7 +2,7 @@
 
 [![IsaacSim](https://img.shields.io/badge/IsaacSim-4.5.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
 [![Isaac Lab](https://img.shields.io/badge/IsaacLab-2.0.2-silver)](https://isaac-sim.github.io/IsaacLab)
-[![RSL_RK](https://img.shields.io/badge/RSL_RL-2.2.4-silver)](https://github.com/leggedrobotics/rsl_rl)
+[![RSL_RK](https://img.shields.io/badge/RSL_RL-2.3.0-silver)](https://github.com/leggedrobotics/rsl_rl)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
 [![Linux platform](https://img.shields.io/badge/platform-linux--64-orange.svg)](https://releases.ubuntu.com/22.04/)
 [![Windows platform](https://img.shields.io/badge/platform-windows--64-orange.svg)](https://www.microsoft.com/en-us/)
@@ -14,6 +14,7 @@
 This repository provides a direct workflow for training a legged robot using IsaacLab. It provides high transparency and low refactoring difficulty of the direct environment, and uses isaaclab components to simplify the workflow.
 
 It has all the necessary conditions for sim-to-real and has been tested on real unitree g1 and h1 robots, [video available](https://www.bilibili.com/video/BV1tNRgYQEnr/).
+Deploy Code: https://github.com/Hellod035/unitree_deploy_py
 
 **Maintainer**: Wandong Sun              
 **Contact**: 24b908020@stu.hit.edu.cn    
@@ -24,6 +25,18 @@ It has all the necessary conditions for sim-to-real and has been tested on real 
 - `Isolation` Work outside the core Isaac Lab repository, ensuring that the development efforts remain self-contained.
 - `Long-term support` This repository will be updated with the updates of isaac sim and isaac lab, and will be supported for a long time.
 
+If you use Legged Lab in your research, please cite it as follows:
+
+```bibtex
+@software{LeggedLab,
+  author = {Wandong, Sun},
+  license = {MIT},
+  title = {Legged Lab: Direct IsaacLab Workflow for Legged Robots},
+  url = {https://github.com/Hellod035/LeggedLab},
+  version = {0.0.1},
+  year = {2025}
+}
+```
 
 ## Installation
 
@@ -33,26 +46,28 @@ It has all the necessary conditions for sim-to-real and has been tested on real 
 
 ```bash
 # Option 1: HTTPS
-git clone https://github.com/Hellod035/legged_lab
+git clone https://gitee.com/usst-imi/leggedlab.git
 
 # Option 2: SSH
-git clone git@github.com:Hellod035/legged_lab.git
+git clone git@gitee.com:usst-imi/leggedlab.git
 ```
 
 - Using a python interpreter that has Isaac Lab installed, install the library
 
 ```bash
-pip install -e legged_lab
+cd leggedlab
+pip install -e .
 ```
 
 - Verify that the extension is correctly installed by running the following command:
 
 ```bash
-python legged_lab/scripts/train.py --task=h1_flat --headless --logger=tensorboard --num_envs=64
-
 python legged_lab/scripts/train.py --task=x02a_flat --headless --logger=tensorboard --num_envs=4096
-
 python legged_lab/scripts/paly.py --task=x02a_flat --num_envs=64
+python legged_lab/scripts/train.py --task=x2_flat --headless --logger=tensorboard --num_envs=8192
+python legged_lab/scripts/paly.py --task=x2_flat --num_envs=64
+python legged_lab/scripts/train.py --task=x2r_flat --headless --logger=tensorboard --num_envs=8192
+python legged_lab/scripts/paly.py --task=x2r_flat --num_envs=64
 ```
 
 
@@ -78,21 +93,6 @@ In some VsCode versions, the indexing of part of the extensions is missing. In t
         "<path-to-IsaacLab>/source/isaaclab",
     ]
 }
-```
-
-### Pylance Crash
-
-If you encounter a crash in `pylance`, it is probable that too many files are indexed and you run out of memory.
-A possible solution is to exclude some of omniverse packages that are not used in your project.
-To do so, modify `.vscode/settings.json` and comment out packages under the key `"python.analysis.extraPaths"`
-Some examples of packages that can likely be excluded are:
-
-```json
-"<path-to-isaac-sim>/extscache/omni.anim.*"         // Animation packages
-"<path-to-isaac-sim>/extscache/omni.kit.*"          // Kit UI tools
-"<path-to-isaac-sim>/extscache/omni.graph.*"        // Graph UI tools
-"<path-to-isaac-sim>/extscache/omni.services.*"     // Services tools
-...
 ```
 
 # References and Thanks

@@ -4,7 +4,8 @@ from isaaclab.utils import configclass
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sensors import ContactSensorCfg
 from isaaclab.terrains.terrain_importer_cfg import TerrainImporterCfg
-from isaaclab.sensors import RayCasterCfg, patterns
+from isaaclab.sensors import patterns
+from legged_lab.terrains.ray_caster_cfg import RayCasterCfg
 from isaaclab.utils.assets import ISAACLAB_NUCLEUS_DIR, ISAAC_NUCLEUS_DIR
 from typing import TYPE_CHECKING
 
@@ -68,5 +69,6 @@ class SceneCfg(InteractiveSceneCfg):
                 pattern_cfg=patterns.GridPatternCfg(resolution=config.height_scanner.resolution, size=config.height_scanner.size),
                 debug_vis=config.height_scanner.debug_vis,
                 mesh_prim_paths=["/World/ground"],
-                update_period=step_dt
+                update_period=step_dt,
+                drift_range=config.height_scanner.drift_range
             )

@@ -44,18 +44,34 @@ ROUGH_TERRAINS_CFG = TerrainGeneratorCfg(
     slope_threshold=0.75,
     use_cache=False,
     sub_terrains={
-        "pyramid_stairs": terrain_gen.MeshPyramidStairsTerrainCfg(
+        "pyramid_stairs_28": terrain_gen.MeshInvertedPyramidStairsTerrainCfg(
             proportion=0.2,
             step_height_range=(0.05, 0.23),
-            step_width=0.33,
+            step_width=0.28,
             platform_width=3.0,
             border_width=1.0,
             holes=False,
         ),
-        "pyramid_stairs_inv": terrain_gen.MeshInvertedPyramidStairsTerrainCfg(
+        "pyramid_stairs_30": terrain_gen.MeshInvertedPyramidStairsTerrainCfg(
             proportion=0.2,
             step_height_range=(0.05, 0.23),
-            step_width=0.33,
+            step_width=0.30,
+            platform_width=3.0,
+            border_width=1.0,
+            holes=False,
+        ),
+        "pyramid_stairs_32": terrain_gen.MeshInvertedPyramidStairsTerrainCfg(
+            proportion=0.2,
+            step_height_range=(0.05, 0.23),
+            step_width=0.32,
+            platform_width=3.0,
+            border_width=1.0,
+            holes=False,
+        ),
+        "pyramid_stairs_34": terrain_gen.MeshInvertedPyramidStairsTerrainCfg(
+            proportion=0.2,
+            step_height_range=(0.05, 0.23),
+            step_width=0.34,
             platform_width=3.0,
             border_width=1.0,
             holes=False,
@@ -66,11 +82,6 @@ ROUGH_TERRAINS_CFG = TerrainGeneratorCfg(
         "random_rough": terrain_gen.HfRandomUniformTerrainCfg(
             proportion=0.2, noise_range=(0.02, 0.10), noise_step=0.02, border_width=0.25
         ),
-        "hf_pyramid_slope": terrain_gen.HfPyramidSlopedTerrainCfg(
-            proportion=0.1, slope_range=(0.0, 0.4), platform_width=2.0, border_width=0.25
-        ),
-        "hf_pyramid_slope_inv": terrain_gen.HfInvertedPyramidSlopedTerrainCfg(
-            proportion=0.1, slope_range=(0.0, 0.4), platform_width=2.0, border_width=0.25
-        ),
+
     },
 )

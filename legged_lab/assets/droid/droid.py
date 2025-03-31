@@ -253,8 +253,8 @@ X2_CFG = ArticulationCfg(
 
 X2R_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        # usd_path=f"{ISAAC_ASSET_DIR}/droid/x2r10/x2r10.usd",
-        usd_path=f"{ISAAC_ASSET_DIR}/droid/x2rw10/x2rw10.usd",
+        usd_path=f"{ISAAC_ASSET_DIR}/droid/x2r10/x2r10.usd",
+        # usd_path=f"{ISAAC_ASSET_DIR}/droid/x2rw10/x2rw10.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,

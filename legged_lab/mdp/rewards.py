@@ -57,6 +57,12 @@ def undesired_contacts(env: BaseEnv, threshold: float, sensor_cfg: SceneEntityCf
     return torch.sum(is_contact, dim=1)
 
 
+def joint_symmetry(env: BaseEnv, std: float, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+    asset: Articulation = env.scene[asset_cfg.name]
+    joint_error = torch.abs(asset.data.joint_pos[:, asset_cfg.joint_ids[0]] - asset.data.default_joint_pos[:, asset_cfg.joint_ids[0]] + asset.data.joint_pos[:, asset_cfg.joint_ids[1]] - asset.data.default_joint_pos[:, asset_cfg.joint_ids[1]])
+    return torch.exp(-joint_error / std**2)
+
+
 def fly(env: BaseEnv, threshold: float, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
     contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
     net_contact_forces = contact_sensor.data.net_forces_w_history

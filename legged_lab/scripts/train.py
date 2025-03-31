@@ -24,7 +24,6 @@ app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 from isaaclab.utils.io import dump_yaml
 
-import isaacsim.core.utils.torch as torch_utils
 from legged_lab.envs import *  # noqa:F401, F403
 from legged_lab.utils.cli_args import update_rsl_rl_cfg
 from isaaclab_tasks.utils import get_checkpoint_path
@@ -41,12 +40,13 @@ torch.backends.cudnn.benchmark = False
 def train():
     runner: OnPolicyRunner
 
-    torch_utils.set_seed(args_cli.seed)
     env_class_name = args_cli.task
     env_cfg, agent_cfg = task_registry.get_cfgs(env_class_name)
     env_class = task_registry.get_task_class(env_class_name)
     if args_cli.num_envs is not None:
         env_cfg.scene.num_envs = args_cli.num_envs
+    if args_cli.seed is not None:
+        env_cfg.scene.seed = args_cli.seed
     env = env_class(env_cfg, args_cli.headless)
 
     agent_cfg = update_rsl_rl_cfg(agent_cfg, args_cli)
