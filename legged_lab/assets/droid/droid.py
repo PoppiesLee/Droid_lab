@@ -145,6 +145,112 @@ X02A_CFG = ArticulationCfg(
 )
 """Configuration for the Droid X02A Humanoid robot."""
 
+X2_CFG = ArticulationCfg(
+    spawn=sim_utils.UsdFileCfg(
+        usd_path=f"{ISAAC_ASSET_DIR}/droid/x2/x2.usd",
+        activate_contact_sensors=True,
+        rigid_props=sim_utils.RigidBodyPropertiesCfg(
+            disable_gravity=False,
+            retain_accelerations=False,
+            linear_damping=0.0,
+            angular_damping=0.0,
+            max_linear_velocity=1000.0,
+            max_angular_velocity=1000.0,
+            max_depenetration_velocity=1.0,
+        ),
+        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
+            enabled_self_collisions=True, solver_position_iteration_count=4, solver_velocity_iteration_count=1
+        ),
+    ),
+    init_state=ArticulationCfg.InitialStateCfg(
+        pos=(0.0, 0.0, 0.91),
+        joint_pos={
+            # ".*_shoulder_pitch": -0.35,  # -15 degrees
+            # ".*_shoulder_roll": 0.32,
+            # ".*_shoulder_yaw": -0.32,
+            # ".*_elbow": 1.920,  # 110 degrees
+            ".*_hip_yaw": 0.0,
+            ".*_hip_roll": 0.0,
+            ".*_hip_pitch": 0.0,  # 30 degrees
+            ".*_knee_pitch": -0.0,  # -60 degrees
+            ".*_ankle_pitch": 0.0,  # 33 degrees
+            ".*_ankle_roll": 0.0,
+        },
+        joint_vel={".*": 0.0},
+    ),
+    soft_joint_pos_limit_factor=0.9,
+    actuators={
+        "legs": ImplicitActuatorCfg(
+            joint_names_expr=[".*_hip_yaw", ".*_hip_roll", ".*_hip_pitch", ".*_knee_pitch"],
+            effort_limit_sim={
+                ".*_hip_yaw":80,
+                ".*_hip_roll":80,
+                ".*_hip_pitch":80,
+                ".*_knee_pitch":80,
+            },
+            velocity_limit_sim=10.0,
+            stiffness={
+                ".*_hip_yaw": 60.0,
+                ".*_hip_roll": 150.0,
+                ".*_hip_pitch": 150.0,
+                ".*_knee_pitch": 200.0,
+            },
+            damping={
+                ".*_hip_yaw": 1.0,
+                ".*_hip_roll": 5.0,
+                ".*_hip_pitch": 5.0,
+                ".*_knee_pitch": 5.0,
+            },
+            armature={
+                ".*_hip_yaw": 0.05,
+                ".*_hip_roll": 0.05,
+                ".*_hip_pitch":0.05,
+                ".*_knee_pitch": 0.05,
+            },
+        ),
+        "feet": ImplicitActuatorCfg(
+            joint_names_expr=[".*_ankle_pitch",".*_ankle_roll"],
+            effort_limit_sim={
+                ".*_ankle_pitch": 20.0,
+                ".*_ankle_roll": 20.0
+                },
+            velocity_limit_sim=10.0,
+            stiffness={
+                ".*_ankle_pitch": 20.0,
+                ".*_ankle_roll": 20.0
+                },
+            damping={
+                ".*_ankle_pitch": 2.0,
+                ".*_ankle_roll": 2.0,
+                },
+            armature={
+                ".*_ankle_pitch": 0.05,
+                ".*_ankle_roll": 0.05
+                },
+        ),
+        # "arms": ImplicitActuatorCfg(
+        #     joint_names_expr=[".*_shoulder_pitch", ".*_shoulder_roll", ".*_shoulder_yaw", ".*_elbow"],
+        #     effort_limit_sim=300,
+        #     velocity_limit_sim=100.0,
+        #     stiffness={
+        #         ".*_shoulder_pitch": 40.0,
+        #         ".*_shoulder_roll": 40.0,
+        #         ".*_shoulder_yaw": 40.0,
+        #         ".*_elbow": 40.0,
+        #     },
+        #     damping={
+        #         ".*_shoulder_pitch": 10.0,
+        #         ".*_shoulder_roll": 10.0,
+        #         ".*_shoulder_yaw": 10.0,
+        #         ".*_elbow": 10.0,
+        #
+        #     },
+        # ),
+    },
+)
+
+"""Configuration for the Droid X2 Humanoid robot."""
+
 X2R_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
         # usd_path=f"{ISAAC_ASSET_DIR}/droid/x2r10/x2r10.usd",
