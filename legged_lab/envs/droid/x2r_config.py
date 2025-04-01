@@ -32,7 +32,7 @@ class X2RRewardCfg(RewardCfg):
     dof_pos_limits = RewTerm(func=mdp.joint_pos_limits, weight=-2.0)
     joint_deviation_hip = RewTerm(func=mdp.joint_deviation_l1, weight=-0.25, params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_hip_yaw.*", ".*_hip_roll.*"])})
     joint_deviation_legs = RewTerm(func=mdp.joint_deviation_l1, weight=-0.02, params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_hip_pitch.*", ".*_knee.*", ".*_ankle.*"])})
-    # feet_swings = RewTerm(func=mdp.feet_swing, weight=0.5, params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=[".*ankle_pitch.*"])})
+    feet_swings = RewTerm(func=mdp.feet_swing, weight=0.5, params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=[".*ankle_pitch.*"])})
 
 @configclass
 class X2RFlatEnvCfg(BaseEnvCfg):

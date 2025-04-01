@@ -12,7 +12,7 @@ from tools.CircularBuffer import CircularBuffer
 
 onnx_mode_path = os.path.join(DEPLOY_FOLDER_DIR, f"policies/policy.onnx")
 env_config_path = os.path.join(DEPLOY_FOLDER_DIR, f"policies/env_cfg.json")
-mujoco_model_path = os.path.join(DEPLOY_FOLDER_DIR, f"../legged_lab/assets/droid/x2rw10/scene.xml")
+mujoco_model_path = os.path.join(DEPLOY_FOLDER_DIR, f"../legged_lab/assets/droid/x2r10/scene.xml")
 
 MAX_LINE_VEL  = 1.5
 MAX_ANGLE_VEL = 0.5

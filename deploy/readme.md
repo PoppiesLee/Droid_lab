@@ -1,7 +1,7 @@
 # Deploy 使用说明
 更新策略
 ```
-scp deploy/policies/policy.onnx root@192.168.55.110:/home/x02lite/deploy/policies/policy.onnx
+scp deploy/policies/* root@192.168.55.110:/home/x02lite/deploy/policies/
 ```
 
 ## 主机端配置(ubuntu22.04,python3.10)
@@ -16,6 +16,42 @@ conda activate legged_lab
 pip install rknn_toolkit2-1.6.0+81f21f
 4d-cp310-cp310-linux_x86_64.whl -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
+
+## 拷贝miniconda
+### 拷贝现有的minconda文件包
+```
+scp droid_miniconda3.tar.gz root@192.168.55.110/root/
+```
+### 登录到机器人终端，解压文件包
+```
+ssh root@192.168.55.110
+tar -xzvf droid_miniconda3.tar.gz
+rm -fr droid_miniconda3.tar.gz
+```
+### 写入环境变量
+```
+cat << 'EOF' >> ~/.bashrc
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/root/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/root/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/root/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/root/miniconda3/bin:$PATH"
+    fi
+fi
+EOF
+```
+### 设置默认不启动base
+```
+source ~/.bashrc
+conda config --set auto_activate_base false
+```
+
 ## 安装miniconda
 ### 登录到机器人终端，配置文件权限
 ```
@@ -76,21 +112,21 @@ sudo chmod 777 /etc/systemd/system/deploy_rl.service
 ```
 sudo systemctl daemon-reload
 ```
-启动ecatplat服务
+启动deploy_rl服务
 ```
-sudo systemctl start deploy_rl.service
+sudo systemctl start deploy_rl
 ```
-设置ecatplat服务自启动
+设置deploy_rl服务自启动
 ```
-sudo systemctl enable deploy_rl.service
+sudo systemctl enable deploy_rl
 ```
-停止ecatplat服务自启动
+停止deploy_rl服务自启动
 ```
-sudo systemctl disable deploy_rl.service
+sudo systemctl disable deploy_rl
 ```
-查看ecatplat服务状态
+查看deploy_rl服务状态
 ```
-sudo systemctl status deploy_rl.service
+sudo systemctl status deploy_rl
 ```
 正常输出下面的状态时，表示服务启动成功
 ```
@@ -104,4 +140,14 @@ sudo systemctl status deploy_rl.service
      CGroup: /system.slice/deploy_rl.service
              ├─1432 /bin/bash /home/x02lite/deploy/script/deploy_rl.sh
              └─1442 python sim2real.py
+```
+
+## AOA跟随系统配置
+拷贝规则文件到机器人端
+```
+scp deploy/script/99-ttyACM0.rules root@192.168.55.110:/etc/udev/rules.d/
+```
+或者登录到机器人终端直接配置用户组权限
+```
+sudo usermod -a -G dialout $USER
 ```
