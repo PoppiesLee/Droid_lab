@@ -12,7 +12,7 @@ from tools.CircularBuffer import CircularBuffer
 
 onnx_mode_path = os.path.join(DEPLOY_FOLDER_DIR, f"policies/policy.onnx")
 env_config_path = os.path.join(DEPLOY_FOLDER_DIR, f"policies/env_cfg.json")
-mujoco_model_path = os.path.join(DEPLOY_FOLDER_DIR, f"../legged_lab/assets/droid/x2r10/scene.xml")
+mujoco_model_path = os.path.join(DEPLOY_FOLDER_DIR, f"../legged_lab/assets/droid/x2/scene.xml")
 
 MAX_LINE_VEL  = 1.5
 MAX_ANGLE_VEL = 0.5
@@ -99,7 +99,7 @@ class Sim2Mujo():
         proj_grav = quat_to_grav(quat, [0, 0, -1])
         # euler = quaternion_to_euler_array(quat)
         # euler[euler > math.pi] -= 2 * math.pi
-        self.command = [1.5, 0., 0.]
+        self.command = [0., 0., 0.]
         # 遥控器键值变步频处理
         if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
             self.gait_frequency = 0
@@ -152,7 +152,8 @@ class Sim2Mujo():
 
 
     def init_robot(self):
-        final_goal = self.cfg.default_joints[:]
+        print("default_joints: ", self.cfg.default_joints)
+        final_goal = self.cfg.default_joints
         target_sequence = []
         target = self.data.qpos.astype(np.double)[-self.num_actions:]
 

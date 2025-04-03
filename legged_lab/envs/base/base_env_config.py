@@ -52,9 +52,9 @@ class BaseEnvCfg:
         height_scan_offset=0.5
     )
     commands: CommandsCfg = CommandsCfg(
-        resampling_time_range=(5.0, 10.0),
-        rel_standing_envs=0.1,
-        rel_heading_envs=0.,
+        resampling_time_range=(10.0, 10.0),
+        rel_standing_envs=0.2,
+        rel_heading_envs=1.0,
         heading_command=True,
         heading_control_stiffness=0.5,
         debug_vis=True,
@@ -110,13 +110,13 @@ class BaseEnvCfg:
             enable=True,
             params={
                 "body_names": MISSING,
-                "mass_distribution_params": (5.0, -5.0),
+                "mass_distribution_params": (-5.0, 5.0),
                 "operation": "add",
             }
         ),
         push_robot=PushRobotCfg(
             enable=True,
-            push_interval_s=7.0,
+            push_interval_s=15.0,
             params={"velocity_range": {"x": (-1.0, 1.0), "y": (-1.0, 1.0)}}
 
         ),

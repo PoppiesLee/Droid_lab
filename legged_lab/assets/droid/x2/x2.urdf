@@ -17,7 +17,7 @@
   <link name="pelvis_link">
     <inertial>
       <origin xyz="0.0017069 8.8509E-09 0.0017759" rpy="0 0 0" />
-      <mass value="9.129" />
+      <mass value="0.129" />
       <inertia ixx="0.13973477" ixy="0.00000011" ixz="-0.00047829" iyy="0.12694500" iyz="-0.00000018" izz="0.07556794" />
     </inertial>
     <visual>
@@ -161,7 +161,7 @@
     <parent link="L_knee_pitch_link" />
     <child link="L_ankle_pitch_link" />
     <axis xyz="0 -1 0" />
-    <limit lower="-1.2217" upper="1.2217" effort="30" velocity="10" />
+    <limit lower="-0.6" upper="0.6" effort="30" velocity="10" />
   </joint>
   <link name="R_hip_yaw_link">
     <inertial>
@@ -306,7 +306,7 @@
     <parent link="R_knee_pitch_link" />
     <child link="R_ankle_pitch_link" />
     <axis xyz="0 -1 0" />
-    <limit lower="-1.2217" upper="1.2217" effort="30" velocity="10" />
+    <limit lower="-0.6" upper="0.6" effort="30" velocity="10" />
   </joint>
   <link name="waist_yaw_link">
     <inertial>
@@ -427,7 +427,7 @@
       </material>
     </visual>
   </link>
-  <joint name="L_shoulder_pitch" type="revolute">
+  <joint name="L_shoulder_pitch" type="fixed">
     <origin xyz="0 0.14043 0.29123" rpy="0 1.309 1.5708" />
     <parent link="torso_link" />
     <child link="L_shoulder_pitch_link" />
@@ -456,7 +456,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="L_shoulder_roll" type="revolute">
+  <joint name="L_shoulder_roll" type="fixed">
     <origin xyz="0 0 0.0575" rpy="-1.5708 0.2618 0" />
     <parent link="L_shoulder_pitch_link" />
     <child link="L_shoulder_roll_link" />
@@ -485,7 +485,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="L_shoulder_yaw" type="revolute">
+  <joint name="L_shoulder_yaw" type="fixed">
     <origin xyz="0.112 0 0" rpy="1.5708 0 1.5708" />
     <parent link="L_shoulder_roll_link" />
     <child link="L_shoulder_yaw_link" />
@@ -514,8 +514,8 @@
       </geometry>
     </collision>
   </link>
-  <joint name="L_elbow_pitch" type="revolute">
-    <origin xyz="0 -0.01 0.148" rpy="1.5708 -1.5708 1.5708" />
+  <joint name="L_elbow_pitch" type="fixed">
+    <origin xyz="0 -0.01 0.148" rpy="1.5708 -2.2 1.5708" />
     <parent link="L_shoulder_yaw_link" />
     <child link="L_elbow_pitch_link" />
     <axis xyz="0 0 1" />
@@ -560,7 +560,7 @@
       </material>
     </visual>
   </link>
-  <joint name="R_shoulder_pitch" type="revolute">
+  <joint name="R_shoulder_pitch" type="fixed">
     <origin xyz="0 -0.14043 0.29123" rpy="0 1.309 -1.5708" />
     <parent link="torso_link" />
     <child link="R_shoulder_pitch_link" />
@@ -589,7 +589,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="R_shoulder_roll" type="revolute">
+  <joint name="R_shoulder_roll" type="fixed">
     <origin xyz="0 0 0.0575" rpy="-1.5708 0.2618 0" />
     <parent link="R_shoulder_pitch_link" />
     <child link="R_shoulder_roll_link" />
@@ -618,7 +618,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="R_shoulder_yaw" type="revolute">
+  <joint name="R_shoulder_yaw" type="fixed">
     <origin xyz="0.112 0 0" rpy="1.5708 0 1.5708" />
     <parent link="R_shoulder_roll_link" />
     <child link="R_shoulder_yaw_link" />
@@ -647,8 +647,8 @@
       </geometry>
     </collision>
   </link>
-  <joint name="R_elbow_pitch" type="revolute">
-    <origin xyz="0 0.01 0.148" rpy="1.5708 -1.5708 1.5708" />
+  <joint name="R_elbow_pitch" type="fixed">
+    <origin xyz="0 0.01 0.148" rpy="1.5708 -0.9416 1.5708" />
     <parent link="R_shoulder_yaw_link" />
     <child link="R_elbow_pitch_link" />
     <axis xyz="0 0 -1" />

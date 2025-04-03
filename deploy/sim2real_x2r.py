@@ -50,6 +50,8 @@ class Sim2Real(LegBase):
         self.num_observations = 41
         self.gait_frequency = 0
         self.cfg = load_configuration("policies/env_cfg.json", MujocoJointOrder)
+        # self.cfg.default_joints[4] = 0.5
+        # self.cfg.default_joints[9] = 0.5
         self.run_flag = True
         self.aoa_reader = AoaReader()
         self.aoa_reader.start_server()
@@ -62,6 +64,7 @@ class Sim2Real(LegBase):
         set_joint_mode(self.legCommand, self.cfg, self.legActions)
 
     def init_robot(self):
+        print("default_joints: ", self.cfg.default_joints)
         self.set_leg_path(1, self.cfg.default_joints[:self.legActions])
         timer = NanoSleep(self.cfg.decimation)  # 创建一个decimation毫秒的NanoSleep对象
         self.get_leg_state()
@@ -69,7 +72,7 @@ class Sim2Real(LegBase):
         while self.legState.rc_keys[0] > 64:
             if self.legState.system_tic - temp_tic > 1000:
                 temp_tic = self.legState.system_tic
-                print("请将CH8急停左滑到底", self.legState.system_tic)
+                print("请将CH8急停左滑到底", self.legState.system_tic, self.legState.rc_du)
             start_time = time.perf_counter()
             self.get_leg_state()
             timer.waiting(start_time)
@@ -116,7 +119,7 @@ class Sim2Real(LegBase):
         if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
             self.gait_frequency = 0
         else:
-            max_abs_command = max(abs(self.command[0]), abs(self.command[1]), abs(self.command[2]))
+            # max_abs_command = max(abs(self.command[0]), abs(self.command[1]), abs(self.command[2]))
             self.gait_frequency = 1.5
         obs = np.zeros([self.num_observations], dtype=np.float32)
         obs[0:3] = base_ang_vel * 1.0
