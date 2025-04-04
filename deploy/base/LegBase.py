@@ -1,9 +1,9 @@
 import math
-from base.Base import *
 from grpc import insecure_channel
-from deploy.policies.Config import Config
-from protos import droid_msg_pb2 as msg_pb2
-from protos import leg_service_pb2_grpc as leg_pb2_grpc
+from deploy.base.Base import *
+from deploy.base.Config import Config
+from deploy.protos import droid_msg_pb2 as msg_pb2
+from deploy.protos import leg_service_pb2_grpc as leg_pb2_grpc
 
 class LegBase:
     def __init__(self):
