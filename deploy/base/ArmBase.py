@@ -1,9 +1,10 @@
 import math
 from Base import *
+import numpy as np
 from deploy.policies.Config import Config
 from grpc import insecure_channel
-from ..protos import arm_service_pb2_grpc as arm_pb2_grpc
-from ..protos import droid_msg_pb2 as msg_pb2
+from protos import arm_service_pb2_grpc as arm_pb2_grpc
+from protos import droid_msg_pb2 as msg_pb2
 
 
 class ArmBase:
@@ -64,23 +65,29 @@ class ArmBase:
             timer.waiting(start_time)  # 等待下一个时间步长
 
     def testArm(self):
+        dt0 = np.zeros(self.armActions)
+        dt1 = np.zeros(self.armActions)
+        dt2 = np.zeros(self.armActions)
         T = 1  # 总时间
-        D2R = math.pi / 180.0
-        dt0 = [-30, 10, 0, 80, -30, 10, 0, 80]  # 假设 NMC 是一个定义好的常量，表示关节数量
-        dt0 = [x * D2R for x in dt0]
-        # 填充 dt1 和 dt2 列表
-        dt1 = [-30 * D2R, 10 * D2R, 0, 100 * D2R, 30 * D2R, 10 * D2R, 0, 100 * D2R]
-        dt2 = [30 * D2R, 10 * D2R, 0, 100 * D2R, -30 * D2R, 10 * D2R, 0, 100 * D2R]
-
+        if self.armActions == 8:
+            dt0 = [round(math.radians(d), 4) for d in [-30, 10, 0,  80, -30, 10, 0,  80]]
+            dt1 = [round(math.radians(d), 4) for d in [-30, 10, 0, 100,  30, 10, 0, 100]]
+            dt2 = [round(math.radians(d), 4) for d in [30,  10, 0, 100, -30, 10, 0, 100]]
+        if self.armActions == 10:
+            dt0 = [round(math.radians(d), 4) for d in [-30, 10, 0,  80, -100, -30, 10, 0,  80, -100]]
+            dt1 = [round(math.radians(d), 4) for d in [-30, 10, 0, 100, -100,  30, 10, 0, 100, -100]]
+            dt2 = [round(math.radians(d), 4) for d in [30,  10, 0, 100, -100, -30, 10, 0, 100, -100]]
         # 执行关节规划
         for i in range(2):
             print("wave round %d" % (i * 2 + 1))
-            # for idx in range(12):
-            #     self.armCommand.finger[idx] = 50
+            if self.ArmEnvCfg.hands_enable:
+                for idx in range(12):
+                    self.armCommand.finger[idx] = 50
             self.set_arm_path(T, dt1)
             print("wave round %d" % (i * 2 + 2))
-            # for idx in range(12):
-            #     self.armCommand.finger[idx] = 5
+            if self.ArmEnvCfg.hands_enable:
+                for idx in range(12):
+                    self.armCommand.finger[idx] = 5
             self.set_arm_path(T, dt2)
         print("return to zero")
         gBot.set_arm_path(T, dt0)

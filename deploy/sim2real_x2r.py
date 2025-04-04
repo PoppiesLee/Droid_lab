@@ -50,8 +50,6 @@ class Sim2Real(LegBase):
         self.num_observations = 41
         self.gait_frequency = 0
         self.cfg = load_configuration("policies/env_cfg.json", MujocoJointOrder)
-        # self.cfg.default_joints[4] = 0.5
-        # self.cfg.default_joints[9] = 0.5
         self.run_flag = True
         self.aoa_reader = AoaReader()
         self.aoa_reader.start_server()
