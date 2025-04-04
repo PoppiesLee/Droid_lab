@@ -160,23 +160,3 @@ if __name__ == '__main__':
     while True:
         print(rc)  # 或者直接使用 rc.A、rc.LEFT_X 等
         time.sleep(0.05)
-
-
-
-# sim2real
-
-# if __name__ == '__main__':
-#
-#     handler = GamepadHandler()
-#     rc = GamepadState()
-#     threading.Thread(target=handler.listen, args=(handle,), daemon=True).start()
-#     mode_path = Config.robot_config.mode_path
-#     print("load mode = ", mode_path)
-#     channel = insecure_channel('192.168.55.10:50051')
-#     # jit
-#     policy = torch.jit.load(mode_path)
-#     # onnx
-#     # policy = ort.InferenceSession(mode_path)
-#     mybot = Sim2Real(Config, policy, channel,rc)
-#     mybot.init_robot()
-#     mybot.run()

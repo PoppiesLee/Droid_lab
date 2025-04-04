@@ -1,5 +1,5 @@
 <mujoco model="x2 scene">
-  <include file="x2.xml"/>
+  <include file="x2d10.xml"/>
 
   <statistic center="1.0 0.7 1.0" extent="0.8"/>
 

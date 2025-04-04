@@ -147,7 +147,7 @@ X02A_CFG = ArticulationCfg(
 
 X2_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAAC_ASSET_DIR}/droid/x2/x2.usd",
+        usd_path=f"{ISAAC_ASSET_DIR}/droid/x2/x2d10/x2d10.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
