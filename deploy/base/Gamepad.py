@@ -51,19 +51,15 @@ from evdev import list_devices
 
 class GamepadHandler:
     def __init__(self, device_path=None, deadzone=5000):
-        self.device_path = device_path or self.find_gamepad()
+        self.device_path = device_path
         self.deadzone = deadzone
-        self.gamepad = InputDevice(self.device_path)
-
-        print(f"已绑定手柄: {self.gamepad.name} @ {self.device_path}")
-
+        self.gamepad = None  # 不立即绑定
         self.key_action_map = {
             "BTN_A": "A", "BTN_B": "B", "BTN_WEST": "Y", "BTN_NORTH": "X",
             "BTN_SELECT": "BACK", "BTN_START": "START",
             "BTN_TL": "LB", "BTN_TR": "RB",
             "BTN_THUMBL": "L3", "BTN_THUMBR": "R3",
         }
-
         self.state = {
             "buttons": set(),
             "left_stick": [0.0, 0.0],
@@ -84,10 +80,32 @@ class GamepadHandler:
         return round(val / 32767.0, 2)
 
     def listen(self, callback=None):
-        for event in self.gamepad.read_loop():
-            self.process_event(event)
-            if callback:
-                callback(self.state)
+        while True:
+            # 如果尚未绑定，先尝试绑定
+            if not self.gamepad:
+                self.reconnect()
+
+            try:
+                for event in self.gamepad.read_loop():
+                    self.process_event(event)
+                    if callback:
+                        callback(self.state)
+            except (OSError, IOError) as e:
+                print(f"❌ 设备断开或不可读: {e}")
+                self.gamepad = None  # 清除旧设备，重新绑定
+                time.sleep(1)
+
+    def reconnect(self):
+        print("🔄 尝试重新绑定手柄...")
+        while True:
+            try:
+                self.device_path = self.find_gamepad()
+                self.gamepad = InputDevice(self.device_path)
+                print(f"✅ 已重新绑定: {self.gamepad.name} @ {self.device_path}")
+                break
+            except Exception as e:
+                print(f"⚠️ 查找失败: {e}，1 秒后重试")
+                time.sleep(1)
 
     def process_event(self, event):
         if event.type == ecodes.EV_KEY:

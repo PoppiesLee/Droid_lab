@@ -1,5 +1,5 @@
 <mujoco model="x2d10">
-  <compiler angle="radian" meshdir="./meshes/"/>
+  <compiler angle="radian" meshdir="../meshes/"/>
   <default>
     <joint damping="0.1" armature="0.01" frictionloss="0.0"/>
   </default>

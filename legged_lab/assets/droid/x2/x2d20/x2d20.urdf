@@ -5,7 +5,7 @@
 <robot name="x2">
 
   <mujoco>
-    <compiler meshdir="./meshes" discardvisual="false"/>
+    <compiler meshdir="../meshes" discardvisual="false"/>
   </mujoco>
 
   <link name="world"></link>

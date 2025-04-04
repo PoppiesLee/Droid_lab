@@ -16,6 +16,7 @@ class ArmBase:
         self.armState = msg_pb2.DroidArmResponse()
         self.armCommand = msg_pb2.DroidCommandRequest()
         channel = insecure_channel(self.ArmEnvCfg.grpc_channel + ":50052")
+        print("Successfully connected to： ", self.ArmEnvCfg.grpc_channel + ":50052")
         self.armStub = arm_pb2_grpc.ArmServiceStub(channel)
         init_command(self.armCommand, self.ArmEnvCfg.num_arm_actions)
         for idx in range(12):

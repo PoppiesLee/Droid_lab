@@ -4,7 +4,7 @@
      For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
 <robot name="x2r10">
   <!-- <mujoco>
-    <compiler meshdir="./meshes" discardvisual="false" />
+    <compiler meshdir="../meshes" discardvisual="false" />
   </mujoco>
 
   <link name="world"></link>
@@ -381,7 +381,7 @@
     <child link="logo_link" />
     <axis xyz="0 0 0" />
   </joint>
-  <link name="head_link">
+  <link name="Head_yaw_link">
     <inertial>
       <origin xyz="0.01547561 0 0.16472894" rpy="0 0 0" />
       <mass value="1.67" />
@@ -390,7 +390,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/head_link.STL" />
+        <mesh filename="meshes/Head_yaw_link.STL" />
       </geometry>
       <material name="">
         <color rgba="1 1 1 1" />
@@ -406,7 +406,7 @@
   <joint name="head" type="fixed">
     <origin xyz="0 0 0.3645" rpy="0 0 0" />
     <parent link="torso_link" />
-    <child link="head_link" />
+    <child link="Head_yaw_link" />
     <axis xyz="0 0 1" />
     <limit lower="-1.571" upper="1.571" effort="50" velocity="5" />
   </joint>

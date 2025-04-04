@@ -14,6 +14,7 @@ class LegBase:
         self.legState = msg_pb2.DroidStateResponse()
         self.legCommand = msg_pb2.DroidCommandRequest()
         channel = insecure_channel(self.LegEnvCfg.grpc_channel + ":50051")
+        print("Successfully connected to： ", self.LegEnvCfg.grpc_channel + ":50051")
         self.legStub = leg_pb2_grpc.LegServiceStub(channel)
         init_command(self.legCommand, self.legActions)
         # 建立通信，获取机器人底层信息
