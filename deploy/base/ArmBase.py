@@ -65,10 +65,10 @@ class ArmBase:
             timer.waiting(start_time)  # 等待下一个时间步长
 
     def testArm(self):
+        T = 1  # 总时间
         dt0 = np.zeros(self.armActions)
         dt1 = np.zeros(self.armActions)
         dt2 = np.zeros(self.armActions)
-        T = 1  # 总时间
         if self.armActions == 8:
             dt0 = [round(math.radians(d), 4) for d in [-30, 10, 0,  80, -30, 10, 0,  80]]
             dt1 = [round(math.radians(d), 4) for d in [-30, 10, 0, 100,  30, 10, 0, 100]]

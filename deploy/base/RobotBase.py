@@ -1,15 +1,16 @@
 import math
 import time
-from base.Base import NanoSleep
-from base.ArmBase import ArmBase
-from base.LegBase import LegBase
-from policies.Config import Config
+import numpy as np
+from deploy.base.Base import NanoSleep
+from deploy.base.ArmBase import ArmBase
+from deploy.base.LegBase import LegBase
+from deploy.base.Config import Config
 
 
 class RobotBase(ArmBase, LegBase):
     def __init__(self, _cfg):
-        ArmBase.__init__(self, _cfg)
-        LegBase.__init__(self, _cfg)
+        ArmBase.__init__(self)
+        LegBase.__init__(self)
         self.robot_actions = self.armActions + self.legActions
 
     # GRPC functions
@@ -53,14 +54,32 @@ class RobotBase(ArmBase, LegBase):
             timer.waiting(start_time)  # 等待下一个时间步长
 
     def run(self):
-        T = 0.5  # 总时间
-        dt0 = [0.] * self.robot_actions  # 假设 NMC 是一个定义好的常量，表示关节数量
-        D2R = math.pi / 180.0
-        # 填充 dt1 和 dt2 列表
-        dt1 = [-30 * D2R, 10 * D2R, 0, 100 * D2R, -100 * D2R, 30 * D2R, 10 * D2R, 0, 100 * D2R, -100 * D2R,
-               0, 0, 30 * D2R, -60 * D2R, 30 * D2R, 0, 0, 0, 0, 0]
-        dt2 = [30 * D2R, 10 * D2R, 0, 100 * D2R, -100 * D2R, -30 * D2R, 10 * D2R, 0, 100 * D2R, -100 * D2R,
-               0, 0, 0, 0, 0, 0, 0, 30 * D2R, -60 * D2R, 30 * D2R]
+        T = 1  # 总时间
+        arm_dt0 = np.zeros(self.armActions)
+        arm_dt1 = np.zeros(self.armActions)
+        arm_dt2 = np.zeros(self.armActions)
+        if self.armActions == 8:
+            arm_dt0 = np.array([round(math.radians(d), 4) for d in [-30, 10, 0,  80, -30, 10, 0,  80]])
+            arm_dt1 = np.array([round(math.radians(d), 4) for d in [-30, 10, 0, 100,  30, 10, 0, 100]])
+            arm_dt2 = np.array([round(math.radians(d), 4) for d in [30,  10, 0, 100, -30, 10, 0, 100]])
+        if self.armActions == 10:
+            arm_dt0 = np.array([round(math.radians(d), 4) for d in [-30, 10, 0,  80, -100, -30, 10, 0,  80, -100]])
+            arm_dt1 = np.array([round(math.radians(d), 4) for d in [-30, 10, 0, 100, -100,  30, 10, 0, 100, -100]])
+            arm_dt2 = np.array([round(math.radians(d), 4) for d in [30,  10, 0, 100, -100, -30, 10, 0, 100, -100]])
+
+        leg_dt0 = np.zeros(self.legActions)
+        leg_dt1 = np.zeros(self.legActions)
+        leg_dt2 = np.zeros(self.legActions)
+        if self.legActions == 10:
+            leg_dt1 = np.array([round(math.radians(d), 4) for d in [0, 0, 30, -60, 30, 0, 0, 0, 0, 0]])
+            leg_dt2 = np.array([round(math.radians(d), 4) for d in [0, 0, 0, 0, 0, 0, 0, 30, -60, 30]])
+        elif self.legActions == 12:
+            leg_dt1 = np.array([round(math.radians(d), 4) for d in [0, 0, 30, -60, 30, -0.3, 0, 0, 0, 0, 0, 0.3]])
+            leg_dt2 = np.array([round(math.radians(d), 4) for d in [0, 0, 0, 0, 0, 0.3, 0, 0, 30, -60, 30, -0.3]])
+
+        dt0 = np.concatenate((arm_dt0, leg_dt0))
+        dt1 = np.concatenate((arm_dt1, leg_dt1))
+        dt2 = np.concatenate((arm_dt2, leg_dt2))
 
         # 执行关节规划
         for i in range(2):
