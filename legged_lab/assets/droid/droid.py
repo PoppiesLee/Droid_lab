@@ -233,7 +233,7 @@ X2_CFG = ArticulationCfg(
 
 X2R_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        # usd_path=f"{ISAAC_ASSET_DIR}/droid/x2r10/x2r10.usd",
+        usd_path=f"{ISAAC_ASSET_DIR}/droid/x2r/x2r10/x2r10.usd",
         # usd_path=f"{ISAAC_ASSET_DIR}/droid/x2rw10/x2rw10.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -250,13 +250,13 @@ X2R_CFG = ArticulationCfg(
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.0, 0.0, 0.95),
+        pos=(0.0, 0.0, 0.91),
         joint_pos={
             ".*_hip_yaw": 0.0,
-            ".*_hip_roll": 0.0,     # 2 deg
-            ".*_hip_pitch": 0.0,    # 12 deg
-            ".*_knee_pitch": 0.0,  # -24 deg
-            ".*_ankle_pitch": 0.0,  #  13 deg
+            ".*_hip_roll": 0.0349,     # 2 deg
+            ".*_hip_pitch": 0.2094,    # 12 deg
+            ".*_knee_pitch": -0.4189,  # -24 deg
+            ".*_ankle_pitch": 0.2269,  #  13 deg
         },
         joint_vel={".*": 0.0},
     ),

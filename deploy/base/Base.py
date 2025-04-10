@@ -17,6 +17,23 @@ class NanoSleep:
             if elapsed_time >= self.duration_sec:
                 break
 
+def get_command(last_value, current_value, max_increment):
+    """
+    返回一个值，该值满足最大增量限制。
+
+    :param last_value: 上一个值
+    :param current_value: 当前值
+    :param max_increment: 最大增量
+    :return: 限制后的值
+    """
+    # 计算当前值与上一个值之间的差值
+    increment = current_value - last_value
+    # 如果差值的绝对值超过了最大增量，则限制它
+    if abs(increment) > max_increment:
+        # 如果差值为正，则增加最大增量；如果差值为负，则减少最大增量
+        return last_value + (max_increment if increment > 0 else -max_increment)
+    # 如果差值在允许范围内，则直接返回当前值
+    return current_value
 
 def quaternion_to_euler_array(quat):
     # Ensure quaternion is in the correct format [x, y, z, w]

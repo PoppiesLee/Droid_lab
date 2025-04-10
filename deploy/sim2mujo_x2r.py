@@ -5,17 +5,16 @@ import mujoco_viewer
 import numpy as np
 from tqdm import tqdm
 import onnxruntime as ort
+from base.Base import get_command
 from deploy import DEPLOY_FOLDER_DIR
-from tools.load_env_config import load_configuration
+from tools.Gamepad import GamepadHandler
 from tools.CircularBuffer import CircularBuffer
+from tools.load_env_config import load_configuration
 
 
 onnx_mode_path = os.path.join(DEPLOY_FOLDER_DIR, f"policies/policy.onnx")
 env_config_path = os.path.join(DEPLOY_FOLDER_DIR, f"policies/env_cfg.json")
-mujoco_model_path = os.path.join(DEPLOY_FOLDER_DIR, f"../legged_lab/assets/droid/x2/x2d10/scene.xml")
-
-MAX_LINE_VEL  = 1.5
-MAX_ANGLE_VEL = 0.5
+mujoco_model_path = os.path.join(DEPLOY_FOLDER_DIR, f"../legged_lab/assets/droid/x2r/x2r10/scene.xml")
 
 #                           0            1            2              3               4                5               6            7            8              9
 IsaacLabJointOrder = ['L_hip_yaw', 'R_hip_yaw', 'L_hip_roll', 'R_hip_roll', 'L_hip_pitch', 'R_hip_pitch', 'L_knee_pitch', 'R_knee_pitch', 'L_ankle_pitch', 'R_ankle_pitch']
@@ -40,27 +39,7 @@ def quat_to_grav(q, v):
     c = q_vec * np.expand_dims(np.sum(q_vec * v, axis=-1), axis=-1) * 2.0
     return a - b + c
 
-
-def get_command(last_value, current_value, max_increment):
-    """
-    返回一个值，该值满足最大增量限制。
-
-    :param last_value: 上一个值
-    :param current_value: 当前值
-    :param max_increment: 最大增量
-    :return: 限制后的值
-    """
-    # 计算当前值与上一个值之间的差值
-    increment = current_value - last_value
-    # 如果差值的绝对值超过了最大增量，则限制它
-    if abs(increment) > max_increment:
-        # 如果差值为正，则增加最大增量；如果差值为负，则减少最大增量
-        return last_value + (max_increment if increment > 0 else -max_increment)
-    # 如果差值在允许范围内，则直接返回当前值
-    return current_value
-
-
-class Sim2Mujo():
+class Sim2Mujo:
     def __init__(self):
         self.gait_frequency = 0
         self.num_actions = 10
@@ -80,6 +59,8 @@ class Sim2Mujo():
         mujoco.mj_step(self.model, self.data)
         self.viewer = mujoco_viewer.MujocoViewer(self.model, self.data, width=1500,height=1500)
         self.cnt_pd_loop = 0
+        self.rc = GamepadHandler()
+
 
     def get_joint_names(self):
         actuators = []
@@ -90,6 +71,16 @@ class Sim2Mujo():
         print("\nMujoco actuators order:\n",actuators, "\n")
         return actuators
 
+    def update_rc_command(self):
+        self.command[0] = get_command(self.command[0], self.rc.state.RIGHT_Y *   2, 0.5)
+        self.command[1] = get_command(self.command[1], self.rc.state.LEFT_X  * 0.5, 0.5)
+        self.command[2] = get_command(self.command[2], self.rc.state.RIGHT_X * 0.8, 0.5)
+        # 遥控器键值变步频处理
+        if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
+            self.gait_frequency = 0
+        else:
+            self.gait_frequency = 1.5
+
     def get_obs(self, gait_process):
         q = self.data.qpos.astype(np.float32)[7:]
         dq = self.data.qvel.astype(np.float32)[6:]
@@ -97,15 +88,8 @@ class Sim2Mujo():
         quat = self.data.qpos[3:7].astype(np.float32)
         quat[:] = quat[[1, 2, 3, 0]]
         proj_grav = quat_to_grav(quat, [0, 0, -1])
-        # euler = quaternion_to_euler_array(quat)
-        # euler[euler > math.pi] -= 2 * math.pi
-        self.command = [0.5, 0., 0.]
-        # 遥控器键值变步频处理
-        if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
-            self.gait_frequency = 0
-        else:
-            max_abs_command = max(abs(self.command[0]), abs(self.command[1]), abs(self.command[2]))
-            self.gait_frequency = 1.5
+        self.update_rc_command()
+
         obs = np.zeros(self.num_observations, dtype=np.float32)
         obs[0:3] = ang_vel
         obs[3:6] = proj_grav
@@ -149,6 +133,7 @@ class Sim2Mujo():
             self.pd_control(self.target_q, q, dq)
             self.cnt_pd_loop += 1
         self.viewer.close()
+        self.rc.stop_server()
 
 
     def init_robot(self):
