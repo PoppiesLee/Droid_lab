@@ -7,18 +7,19 @@ from tqdm import tqdm
 import onnxruntime as ort
 from base.Base import get_command
 from deploy import DEPLOY_FOLDER_DIR
-from tools.Gamepad import GamepadHandler
+from tools.GamepadMacOs import GamepadHandler  # 注意在macos下调用的遥控器读取程序不一样
 from tools.CircularBuffer import CircularBuffer
 from tools.load_env_config import load_configuration
-
 
 onnx_mode_path = os.path.join(DEPLOY_FOLDER_DIR, f"policies/policy.onnx")
 env_config_path = os.path.join(DEPLOY_FOLDER_DIR, f"policies/env_cfg.json")
 mujoco_model_path = os.path.join(DEPLOY_FOLDER_DIR, f"../legged_lab/assets/droid/x2r/x2r10/scene.xml")
 
 #                           0            1            2              3               4                5               6            7            8              9
-IsaacLabJointOrder = ['L_hip_yaw', 'R_hip_yaw', 'L_hip_roll', 'R_hip_roll', 'L_hip_pitch', 'R_hip_pitch', 'L_knee_pitch', 'R_knee_pitch', 'L_ankle_pitch', 'R_ankle_pitch']
-MujocoJointOrder   = ['L_hip_yaw', 'L_hip_roll', 'L_hip_pitch', 'L_knee_pitch', 'L_ankle_pitch', 'R_hip_yaw', 'R_hip_roll', 'R_hip_pitch', 'R_knee_pitch', 'R_ankle_pitch']
+IsaacLabJointOrder = ['L_hip_yaw', 'R_hip_yaw', 'L_hip_roll', 'R_hip_roll', 'L_hip_pitch', 'R_hip_pitch',
+                      'L_knee_pitch', 'R_knee_pitch', 'L_ankle_pitch', 'R_ankle_pitch']
+MujocoJointOrder = ['L_hip_yaw', 'L_hip_roll', 'L_hip_pitch', 'L_knee_pitch', 'L_ankle_pitch', 'R_hip_yaw',
+                    'R_hip_roll', 'R_hip_pitch', 'R_knee_pitch', 'R_ankle_pitch']
 # 找到 IsaacLabJointOrder 中每个关节在 MujocoJointOrder 中的索引
 Mujoco_to_Isaac_indices = [MujocoJointOrder.index(joint) for joint in IsaacLabJointOrder]
 # 找到 MujocoJointOrder 中每个关节在 IsaacLabJointOrder 中的索引
@@ -39,6 +40,7 @@ def quat_to_grav(q, v):
     c = q_vec * np.expand_dims(np.sum(q_vec * v, axis=-1), axis=-1) * 2.0
     return a - b + c
 
+
 class Sim2Mujo:
     def __init__(self):
         self.gait_frequency = 0
@@ -57,10 +59,9 @@ class Sim2Mujo:
         self.model.opt.timestep = self.cfg.dt
         self.data = mujoco.MjData(self.model)
         mujoco.mj_step(self.model, self.data)
-        self.viewer = mujoco_viewer.MujocoViewer(self.model, self.data, width=1500,height=1500)
+        self.viewer = mujoco_viewer.MujocoViewer(self.model, self.data, width=1500, height=1500)
         self.cnt_pd_loop = 0
         self.rc = GamepadHandler()
-
 
     def get_joint_names(self):
         actuators = []
@@ -68,12 +69,13 @@ class Sim2Mujo:
             joint_id = self.model.actuator_trnid[i]  # 获取关节 ID
             _name = mujoco.mj_id2name(self.model, mujoco.mjtObj.mjOBJ_JOINT, joint_id[0])  # 获取关节名称
             actuators.append(_name)
-        print("\nMujoco actuators order:\n",actuators, "\n")
+        print("\nMujoco actuators order:\n", actuators, "\n")
         return actuators
 
     def update_rc_command(self):
-        self.command[0] = get_command(self.command[0], self.rc.state.RIGHT_Y *   2, 0.5)
-        self.command[1] = get_command(self.command[1], self.rc.state.LEFT_X  * 0.5, 0.5)
+        self.rc.get_gamepad()
+        self.command[0] = get_command(self.command[0], self.rc.state.RIGHT_Y * 2, 0.5)
+        self.command[1] = get_command(self.command[1], self.rc.state.LEFT_X * 0.5, 0.5)
         self.command[2] = get_command(self.command[2], self.rc.state.RIGHT_X * 0.8, 0.5)
         # 遥控器键值变步频处理
         if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
@@ -96,7 +98,7 @@ class Sim2Mujo:
         obs[6:9] = self.command
         obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
         obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
-        obs[11: 21] = (q- self.cfg.default_joints)[Mujoco_to_Isaac_indices]
+        obs[11: 21] = (q - self.cfg.default_joints)[Mujoco_to_Isaac_indices]
         obs[21: 31] = dq[Mujoco_to_Isaac_indices]
         obs[31: 41] = self.action[Mujoco_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
@@ -112,8 +114,8 @@ class Sim2Mujo:
 
     def get_action(self, obs):
         obs = [np.array(obs, dtype=np.float32)]
-        action =np.array(self.onnx_policy.run(None, {"obs": obs})[0].tolist()[0])
-        self.action = np.clip(action[Isaac_to_Mujoco_indices], -100.0,100.0)
+        action = np.array(self.onnx_policy.run(None, {"obs": obs})[0].tolist()[0])
+        self.action = np.clip(action[Isaac_to_Mujoco_indices], -100.0, 100.0)
         return self.action * self.cfg.action_scale + self.cfg.default_joints
 
     def run(self):
@@ -134,7 +136,6 @@ class Sim2Mujo:
             self.cnt_pd_loop += 1
         self.viewer.close()
         self.rc.stop_server()
-
 
     def init_robot(self):
         print("default_joints: ", self.cfg.default_joints)

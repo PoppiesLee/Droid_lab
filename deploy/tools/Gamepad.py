@@ -1,3 +1,4 @@
+# 本代码适用于linux环境下的手柄键值读取，遥控器键值在子线程自动刷新
 import time
 import threading
 from evdev import InputDevice, categorize, ecodes
@@ -68,7 +69,6 @@ class GamepadHandler:
             try:
                 for event in self.__gamepad.read_loop():
                     self.__process_event(event)
-                    self.__handle_state()
             except (OSError, IOError) as e:
                 print(f"设备断开或不可读: {e}")
                 self.__gamepad = None  # 清除旧设备，重新绑定
@@ -126,8 +126,7 @@ class GamepadHandler:
         elif event.type != 0:
             print(event.type)
 
-    def __handle_state(self):
-        # 在这里可以添加对 state 的处理逻辑
+    def get_gamepad(self):
         pass
 
     def __start_server(self):
@@ -141,8 +140,10 @@ class GamepadHandler:
         if self.__thread:
             self.__thread.join()  # 等待线程结束
         print("Server shutdown requested.")
+
     def get_connect_state(self):
         return self.__is_connect
+
 
 if __name__ == '__main__':
     rc = GamepadHandler()
