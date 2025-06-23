@@ -13,13 +13,11 @@ from tools.load_env_config import load_configuration
 
 onnx_mode_path = os.path.join(DEPLOY_FOLDER_DIR, f"policies/policy.onnx")
 env_config_path = os.path.join(DEPLOY_FOLDER_DIR, f"policies/env_cfg.json")
-mujoco_model_path = os.path.join(DEPLOY_FOLDER_DIR, f"../legged_lab/assets/droid/x2r/x2r10/scene.xml")
+mujoco_model_path = os.path.join(DEPLOY_FOLDER_DIR, f"../legged_lab/assets/droid/X2C_PRO/scene.xml")
 
 #                           0            1            2              3               4                5               6            7            8              9
-IsaacLabJointOrder = ['L_hip_yaw', 'R_hip_yaw', 'L_hip_roll', 'R_hip_roll', 'L_hip_pitch', 'R_hip_pitch',
-                      'L_knee_pitch', 'R_knee_pitch', 'L_ankle_pitch', 'R_ankle_pitch']
-MujocoJointOrder = ['L_hip_yaw', 'L_hip_roll', 'L_hip_pitch', 'L_knee_pitch', 'L_ankle_pitch', 'R_hip_yaw',
-                    'R_hip_roll', 'R_hip_pitch', 'R_knee_pitch', 'R_ankle_pitch']
+IsaacLabJointOrder = ['L_hip_yaw', 'R_hip_yaw', 'L_hip_roll', 'R_hip_roll', 'L_hip_pitch', 'R_hip_pitch', 'L_knee_pitch', 'R_knee_pitch', 'L_ankle_pitch', 'R_ankle_pitch', 'L_ankle_roll', 'R_ankle_roll']
+MujocoJointOrder = ['L_hip_yaw', 'L_hip_roll', 'L_hip_pitch', 'L_knee_pitch', 'L_ankle_pitch', 'L_ankle_roll', 'R_hip_yaw', 'R_hip_roll', 'R_hip_pitch', 'R_knee_pitch', 'R_ankle_pitch', 'R_ankle_roll']
 # 找到 IsaacLabJointOrder 中每个关节在 MujocoJointOrder 中的索引
 Mujoco_to_Isaac_indices = [MujocoJointOrder.index(joint) for joint in IsaacLabJointOrder]
 # 找到 MujocoJointOrder 中每个关节在 IsaacLabJointOrder 中的索引
@@ -44,8 +42,8 @@ def quat_to_grav(q, v):
 class Sim2Mujo:
     def __init__(self):
         self.gait_frequency = 0
-        self.num_actions = 10
-        self.num_observations = 41
+        self.num_actions = 12
+        self.num_observations = 47
         # joint target
         self.command = [0., 0., 0.]
         self.target_q = np.zeros(self.num_actions, dtype=np.double)
@@ -98,9 +96,9 @@ class Sim2Mujo:
         obs[6:9] = self.command
         obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
         obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
-        obs[11: 21] = (q - self.cfg.default_joints)[Mujoco_to_Isaac_indices]
-        obs[21: 31] = dq[Mujoco_to_Isaac_indices]
-        obs[31: 41] = self.action[Mujoco_to_Isaac_indices]
+        obs[11: 23] = (q - self.cfg.default_joints)[Mujoco_to_Isaac_indices]
+        obs[23: 35] = dq[Mujoco_to_Isaac_indices]
+        obs[35: 47] = self.action[Mujoco_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
         return q, dq, obs
 

@@ -139,7 +139,6 @@ class BaseEnv(VecEnv):
             action * self.obs_scales.actions
         ], dim=-1,
         )
-
         root_lin_vel = robot.data.root_lin_vel_b
         feet_contact = torch.max(torch.norm(net_contact_forces[:, :, self.feet_cfg.body_ids], dim=-1), dim=1)[0] > 0.5
         current_critic_obs = torch.cat([
@@ -241,8 +240,9 @@ class BaseEnv(VecEnv):
 
     def check_reset(self):
         net_contact_forces = self.contact_sensor.data.net_forces_w_history
-
         reset_buf = torch.any(torch.max(torch.norm(net_contact_forces[:, :, self.termination_contact_cfg.body_ids], dim=-1,), dim=1,)[0] > 1.0, dim=1)
+        projected_gravity = self.robot.data.projected_gravity_b
+        reset_buf |= torch.logical_or(torch.abs(projected_gravity[:, 1]) > 0.8, torch.abs(projected_gravity[:, 0]) > 0.8)
         time_out_buf = self.episode_length_buf >= self.max_episode_length
         reset_buf |= time_out_buf
         return reset_buf, time_out_buf

@@ -1,0 +1,87 @@
+from legged_lab.envs.base.base_env_config import (  # noqa:F401
+    BaseEnvCfg, BaseAgentCfg, BaseSceneCfg, RobotCfg, DomainRandCfg,
+    RewardCfg, HeightScannerCfg, AddRigidBodyMassCfg, PhysxCfg, SimCfg, MLPPolicyCfg, RNNPolicyCfg
+)
+from legged_lab.assets.droid import X03B_CFG
+from legged_lab.terrains import GRAVEL_TERRAINS_CFG, ROUGH_TERRAINS_CFG
+from isaaclab.managers import RewardTermCfg as RewTerm
+import legged_lab.mdp as mdp
+from isaaclab.managers.scene_entity_cfg import SceneEntityCfg
+from isaaclab.utils import configclass
+
+
+@configclass
+class X03BRewardCfg(RewardCfg):
+    track_lin_vel_xy_exp = RewTerm(func=mdp.track_lin_vel_xy_yaw_frame_exp, weight=1.0, params={"std": 0.5})
+    track_ang_vel_z_exp = RewTerm(func=mdp.track_ang_vel_z_world_exp, weight=1.0, params={"std": 0.5})
+    lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=-1.0)
+    ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.06)
+    # energy = RewTerm(func=mdp.energy, weight=-0.5e-4)
+    joint_vel_torque = RewTerm(func=mdp.joint_vel_torque,weight=-5e-10)
+    dof_acc_l2 = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-7)
+    action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-0.01)
+    undesired_contacts = RewTerm(func=mdp.undesired_contacts, weight=-1.0, params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=".*ankle_roll.*"), "threshold": 1.0})
+    fly = RewTerm(func=mdp.fly, weight=-1.0, params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=".*ankle_roll.*"), "threshold": 1.0})
+    body_orientation_l2 = RewTerm(func=mdp.body_orientation_l2, params={"asset_cfg": SceneEntityCfg("robot", body_names=".*waist_roll.*")}, weight=-2.0)
+    flat_orientation_l2 = RewTerm(func=mdp.flat_orientation_l2, weight=0.0)
+    termination_penalty = RewTerm(func=mdp.is_terminated, weight=-200.0)
+    feet_air_time = RewTerm(func=mdp.feet_air_time_positive_biped, weight=0.15, params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=".*ankle_roll.*"), "threshold": 0.5})
+    feet_slide = RewTerm(func=mdp.feet_slide, weight=-0.25, params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=".*ankle_roll.*"), "asset_cfg": SceneEntityCfg("robot", body_names=".*_ankle_roll.*")})
+    feet_force = RewTerm(func=mdp.body_force, weight=-3e-3, params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=".*ankle_roll.*"), "threshold": 500, "max_reward": 400})
+    feet_too_near = RewTerm(func=mdp.feet_too_near_humanoid, weight=-2.0, params={"asset_cfg": SceneEntityCfg("robot", body_names=[".*ankle_roll.*"]), "threshold": 0.3})
+    feet_stumble = RewTerm(func=mdp.feet_stumble, weight=-2.0, params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=[".*ankle_roll.*"])})
+    dof_pos_limits = RewTerm(func=mdp.joint_pos_limits, weight=-1.2)
+    joint_deviation_waist_roll = RewTerm(func=mdp.joint_deviation_l1, weight=-2.0,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*waist_roll"])})
+    joint_deviation_waist_yaw = RewTerm(func=mdp.joint_deviation_l1, weight=-10,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*waist_yaw"])})
+    joint_deviation_hip_yaw = RewTerm(func=mdp.joint_deviation_l1, weight=-0.80,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_hip_yaw"])})
+    joint_deviation_hip_roll = RewTerm(func=mdp.joint_deviation_l1, weight=-0.10,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_hip_roll"])})
+    # joint_deviation_arms = RewTerm(func=mdp.joint_deviation_l1, weight=-0.2, params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*waist.*", ".*_shoulder_roll.*", ".*_shoulder_yaw.*", ".*_wrist.*"])})
+    joint_deviation_legs = RewTerm(func=mdp.joint_deviation_l1, weight=-0.05, params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_hip_pitch", ".*_knee.*"])})
+    joint_deviation_legs_ankle = RewTerm(func=mdp.joint_deviation_l1, weight=-0.15,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_ankle.*"])})
+    joint_deviation_ankles = RewTerm(func=mdp.joint_deviation_l1, weight=-0.5, params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_ankle_roll.*"])})
+    feet_swings = RewTerm(func=mdp.feet_swing, weight=0.5, params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=[".*ankle_roll.*"])})
+
+
+@configclass
+class X03BFlatEnvCfg(BaseEnvCfg):
+
+    reward = X03BRewardCfg()
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.scene.height_scanner.prim_body_name = "pelvis_link"
+        self.scene.robot = X03B_CFG
+        self.scene.terrain_type = "generator"
+        self.scene.terrain_generator = GRAVEL_TERRAINS_CFG
+        self.robot.terminate_contacts_body_names = [".*waist_roll_link"]
+        self.robot.feet_body_names = [".*ankle_roll.*"]
+        self.domain_rand.add_rigid_body_mass.params["body_names"] = [".*waist_roll_link"]
+
+
+@configclass
+class X03BFlatAgentCfg(BaseAgentCfg):
+    experiment_name: str = "X03B_flat"
+    wandb_project: str = "X03B_flat"
+
+
+@configclass
+class X03BRoughEnvCfg(X03BFlatEnvCfg):
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.scene.height_scanner.enable_height_scan = True
+        self.scene.terrain_generator = ROUGH_TERRAINS_CFG
+        self.robot.actor_obs_history_length = 1
+        self.robot.critic_obs_history_length = 1
+        self.reward.feet_air_time.weight = 0.25
+        self.reward.track_lin_vel_xy_exp_relax = RewTerm(func=mdp.track_lin_vel_xy_yaw_frame_exp, weight=1.0, params={"std": 0.7})
+        self.reward.track_lin_vel_xy_exp.weight = 0.5
+        self.reward.track_ang_vel_z_exp.weight = 1.5
+        self.reward.lin_vel_z_l2.weight = -0.25
+
+
+@configclass
+class X03BRoughAgentCfg(BaseAgentCfg):
+    experiment_name: str = "X03B_rough"
+    wandb_project: str = "X03B_rough"
+    policy = RNNPolicyCfg()

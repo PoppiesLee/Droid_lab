@@ -83,9 +83,9 @@ class CommandsCfg:
 
 @configclass
 class NoiseScalesCfg:
-    ang_vel: float = 0.2
+    ang_vel: float = 0.5
     projected_gravity: float = 0.05
-    joint_pos: float = 0.01
+    joint_pos: float = 0.02
     joint_vel: float = 1.5
     height_scan: float = 0.1
 
@@ -130,7 +130,6 @@ class RandomizeRobotFrictionCfg:
         "restitution_range": [0.0, 0.005],
         "num_buckets": 64,
     }
-
 
 @configclass
 class AddRigidBodyMassCfg:

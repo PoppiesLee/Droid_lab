@@ -1,7 +1,7 @@
 import math
 from grpc import insecure_channel
 from deploy.base.Base import *
-from deploy.base.Config import Config
+from deploy.base.ConfigX3 import Config
 from deploy.protos import droid_msg_pb2 as msg_pb2
 from deploy.protos import leg_service_pb2_grpc as leg_pb2_grpc
 
@@ -22,6 +22,7 @@ class LegBase:
         self.get_leg_state()
         # 电机空间控制或关节空间控制
         set_motor_mode(self.legCommand, self.legConfigs)
+        # set_joint_mode(self.legCommand, self.legConfigs, 12)
 
     def get_leg_config(self):
         empty_request = msg_pb2.Empty()
@@ -65,15 +66,13 @@ class LegBase:
         dt0 = np.zeros(self.legActions)
         dt1 = np.zeros(self.legActions)
         dt2 = np.zeros(self.legActions)
-        # 填充 dt1 和 dt2 列表
-        if self.legActions == 10:
-            dt1 = [round(math.radians(d), 4) for d in [0, 0, 30, -60, 30, 0, 0, 0, 0, 0]]
-            dt2 = [round(math.radians(d), 4) for d in [0, 0, 0, 0, 0, 0, 0, 30, -60, 30]]
-        elif self.legActions == 12:
-            dt1 = [round(math.radians(d), 4) for d in [0, 0, 30, -60, 30, -0.3, 0, 0, 0, 0, 0, 0.3]]
-            dt2 = [round(math.radians(d), 4) for d in [0, 0, 0, 0, 0, 0.3, 0, 0, 30, -60, 30, -0.3]]
+        D2R = math.pi / 180.0
+        # dt1 = [0, 0,   0,  20*D2R,  0,   0, 0,    0,  -20*D2R,  0,   0, 0]
+        # dt2 = [0, 0,   0,  -20*D2R,  0,   0, 0,    0,  20*D2R,  0,   0, 0]
+        dt1 = [0, 0,  20*D2R, 0, -30*D2R, 0, 10*D2R, 0, 0, -20*D2R, 0, -30*D2R, 0, 10*D2R]
+        dt2 = [0, 0, -20*D2R, 0, 0, 0, 0, 0, 0,  20*D2R, 0, 0, 0, 0]
         # 执行关节规划
-        for i in range(2):
+        for i in range(6):
             print("wave round %d" % (i * 2 + 1))
             self.set_leg_path(T, dt1)
             print("wave round %d" % (i * 2 + 2))

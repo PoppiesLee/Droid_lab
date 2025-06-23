@@ -142,3 +142,20 @@ def feet_swing(env: BaseEnv, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
     contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
     feet_contact = contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, 2] > 3
     return (left_swing & ~feet_contact[:, 0]).float() + (right_swing & ~feet_contact[:, 1]).float()
+
+def joint_vel_torque(
+    env:BaseEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
+) -> torch.Tensor:
+    asset: Articulation = env.scene[asset_cfg.name]
+    joint_vel = asset.data.joint_vel[:, asset_cfg.joint_ids]  # 索引指定关节
+    applied_torque = asset.data.applied_torque[:, asset_cfg.joint_ids]
+
+    # 逐关节计算两种奖励分量 -----------------------------------------------------------------
+    # 速度>0时的奖励分量（保留每个关节的贡献，不降维）
+    reward_vel_positive = torch.abs(applied_torque * joint_vel)  # 形状: (batch_size, num_joints)
+    # 速度<=0时的奖励分量（每个关节的扭矩平方）
+    reward_vel_non_positive = torch.square(applied_torque)  # 形状: (batch_size, num_joints)
+
+    # 若速度>0的位置用reward_vel_positive，否则用reward_vel_non_positive
+    reward = torch.where(joint_vel > 0.05, reward_vel_positive, reward_vel_non_positive)
+    return torch.sum(reward, dim=1)  # 汇总所有关节的奖励

@@ -71,7 +71,7 @@ class BaseEnvCfg:
         noise_scales=NoiseScalesCfg(
             ang_vel=0.5,
             projected_gravity=0.05,
-            joint_pos=0.05,
+            joint_pos=0.1,
             joint_vel=1.5,
             height_scan=0.1,
         )
