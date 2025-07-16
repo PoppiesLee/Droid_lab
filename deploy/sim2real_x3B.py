@@ -46,7 +46,9 @@ class Sim2Real(LegBase):
 
     def init_robot(self):
         print("default_joints: ", self.cfg.default_joints)
+        # self.standq0 = (self.cfg.default_joints + self.q0)
         self.set_leg_path(1, self.cfg.default_joints[:self.legActions])
+
         timer = NanoSleep(self.cfg.decimation)  # 创建一个decimation毫秒的NanoSleep对象
 
         print("单击三开始, LT按压到底到底急停")
@@ -59,17 +61,19 @@ class Sim2Real(LegBase):
             timer.waiting(start_time)
 
     def update_rc_command(self):
-        self.command[0] = get_command(self.command[0], self.rc.state.LEFT_Y  *   2, 0.001)
-        self.command[1] = get_command(self.command[1], self.rc.state.LEFT_X  * 0.5, 0.001)
-        self.command[2] = get_command(self.command[2], self.rc.state.RIGHT_X * 0.5, 0.0001)
+        self.command[0] = get_command(self.command[0], self.rc.state.LEFT_Y   * 0.5, 0.01)
+        self.command[1] = get_command(self.command[1], self.rc.state.RIGHT_X  * 0.5, 0.01)
+        self.command[2] = get_command(self.command[2], self.rc.state.LEFT_X   * 0.5, 0.01)
         print(self.command)
         # 遥控器键值变步频处理
         if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
             self.gait_frequency = 0
         else:
-            self.gait_frequency = 1.5
+            self.gait_frequency = 1.0
 
     def get_obs(self, gait_process):
+        # q = np.array(self.legState.abs_encoder)
+        # q *= 0.0174533
         q = np.array(self.legState.position)
         dq = np.array(self.legState.velocity)
 

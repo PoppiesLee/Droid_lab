@@ -46,6 +46,8 @@ class BaseEnvCfg:
             joint_vel=1.0,
             actions=1.0,
             height_scan=1.0,
+            # foot_dist = 2.4,
+            # feet_collision = 1.0
         ),
         clip_observations=100.0,
         clip_actions=100.0,
@@ -59,8 +61,8 @@ class BaseEnvCfg:
         heading_control_stiffness=0.5,
         debug_vis=True,
         ranges=CommandRangesCfg(
-            lin_vel_x=(-0.6, 1.0),
-            lin_vel_y=(-0.5, 0.5),
+            lin_vel_x=(-1.0, 1.0),
+            lin_vel_y=(-1.0, 1.0),
             ang_vel_z=(-1.0, 1.0),
             heading=(-math.pi, math.pi)
         ),
@@ -78,7 +80,7 @@ class BaseEnvCfg:
     )
     domain_rand: DomainRandCfg = DomainRandCfg(
         reset_robot_joints=ResetRobotJointsCfg(
-            params={"position_range": (0.5, 1.5), "velocity_range": (0.0, 0.0)}
+            params={"position_range": (0.8, 1.2), "velocity_range": (0.0, 0.0)}
         ),
         reset_robot_base=ResetRobotBaseCfg(
             params={
@@ -126,8 +128,8 @@ class BaseEnvCfg:
         ),
     )
     sim: SimCfg = SimCfg(
-        dt=0.001,
-        decimation=10,
+        dt=0.005,
+        decimation=2,
         physx=PhysxCfg(
             gpu_max_rigid_patch_count=10 * 2**15
         )

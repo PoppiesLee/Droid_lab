@@ -122,6 +122,11 @@ class BaseEnv(VecEnv):
         robot = self.robot
         net_contact_forces = self.contact_sensor.data.net_forces_w_history
 
+        # +++++++++++  feet_dist  ++++++++++++
+        # feet_pos_w = self.scene["robot"].data.body_pos_w[:, self.feet_cfg.body_ids, :]  # (N, 2, 3)
+        # foot_dist = torch.norm(feet_pos_w[:, 0] - feet_pos_w[:, 1], dim=-1, keepdim=True)  # (N, 1)
+        # feet_collision_flag = (foot_dist < 0.22).float()
+
         ang_vel = robot.data.root_ang_vel_b
         projected_gravity = robot.data.projected_gravity_b
         command = self.command_generator.command
@@ -144,7 +149,9 @@ class BaseEnv(VecEnv):
         current_critic_obs = torch.cat([
             current_actor_obs,
             root_lin_vel * self.obs_scales.lin_vel,
-            feet_contact
+            feet_contact,
+            # foot_dist * self.obs_scales.foot_dist,
+            # feet_collision_flag * self.obs_scales.feet_collision,
         ], dim=-1)
 
         return current_actor_obs, current_critic_obs
@@ -281,9 +288,10 @@ class BaseEnv(VecEnv):
             noise_vec[:3] = noise_scales.ang_vel * noise_level * self.obs_scales.ang_vel
             noise_vec[3:6] = (noise_scales.projected_gravity * noise_level * self.obs_scales.projected_gravity)
             noise_vec[6:9] = 0
-            noise_vec[9 : 9 + self.num_actions] = (noise_scales.joint_pos * noise_level * self.obs_scales.joint_pos)
-            noise_vec[9 + self.num_actions : 9 + self.num_actions * 2] = (noise_scales.joint_vel * noise_level * self.obs_scales.joint_vel)
-            noise_vec[9 + self.num_actions * 2 : 9 + self.num_actions * 3] = 0.0
+            noise_vec[9:11] = 0
+            noise_vec[11 : 11 + self.num_actions] = (noise_scales.joint_pos * noise_level * self.obs_scales.joint_pos)
+            noise_vec[11 + self.num_actions : 11 + self.num_actions * 2] = (noise_scales.joint_vel * noise_level * self.obs_scales.joint_vel)
+            noise_vec[11 + self.num_actions * 2 : 11 + self.num_actions * 3] = 0.0
             self.noise_scale_vec = noise_vec
 
             if self.cfg.scene.height_scanner.enable_height_scan:

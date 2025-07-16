@@ -16,9 +16,10 @@ class Config:
     num_observations = 660
     # default_joints = np.array([0,    0,   0.3,    0,   -0.6,   0.3,  0,    0,    0,   0.3,   0,  -0.6, 0.3, 0], dtype=np.float32)
     default_joints = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float32)
-    dof_stiffness = np.array([200, 150, 150, 100, 150, 100, 100, 100, 150, 150, 100, 150, 100, 100], dtype=np.float32)
+                                    #mwr mhrl mhpl mhyl mkpl mapl marl mwy  mhrr mhpr mhyr mkpr mapr marr
+    dof_stiffness = np.array([250, 200, 200,  50, 150,  50,  20, 150, 200, 200,  50, 150,  50,  20], dtype=np.float32)
     dof_stiffness*=1.0
-    dof_damping = np.array([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5], dtype=np.float32)
+    dof_damping = np.array([    3,   3,   3,   3,   3,   2,   2,   3,   3,   3,   3,   3,   2,   2], dtype=np.float32)
     run_duration = 100.0  # 单位s
     gait_frequency = 1.5  # sec
     action_scale = 0.25

@@ -52,6 +52,8 @@ class ObsScalesCfg:
     joint_vel: float = 1.0
     actions: float = 1.0
     height_scan: float = 1.0
+    # foot_dist: float = 1.0
+    # feet_collision: float = 1.0
 
 
 @configclass
