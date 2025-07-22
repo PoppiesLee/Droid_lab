@@ -61,9 +61,9 @@ class BaseEnvCfg:
         heading_control_stiffness=0.5,
         debug_vis=True,
         ranges=CommandRangesCfg(
-            lin_vel_x=(-1.0, 1.0),
-            lin_vel_y=(-1.0, 1.0),
-            ang_vel_z=(-1.0, 1.0),
+            lin_vel_x=(-0.5, 0.5),
+            lin_vel_y=(-0.5, 0.5),
+            ang_vel_z=(-0.5, 0.5),
             heading=(-math.pi, math.pi)
         ),
     )
@@ -118,7 +118,7 @@ class BaseEnvCfg:
         ),
         push_robot=PushRobotCfg(
             enable=True,
-            push_interval_s=15.0,
+            push_interval_s=5.0,
             params={"velocity_range": {"x": (-1.0, 1.0), "y": (-1.0, 1.0)}}
 
         ),

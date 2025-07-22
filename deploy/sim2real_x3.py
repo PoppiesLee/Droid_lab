@@ -68,7 +68,7 @@ class Sim2Real(LegBase):
         if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
             self.gait_frequency = 0
         else:
-            self.gait_frequency = 1.5
+            self.gait_frequency = 1.0
 
     def get_obs(self, gait_process):
         q = np.array(self.legState.position)

@@ -228,7 +228,8 @@ class BaseEnv(VecEnv):
         reward_buf = self.reward_manager.compute(self.step_dt)
         env_ids = self.reset_buf.nonzero(as_tuple=False).flatten()
         self.reset(env_ids)
-        self.gait_frequency[env_ids] = torch_rand_float(1.0, 2.0, (len(env_ids), 1), device=self.device).squeeze(1)
+        # self.gait_frequency[env_ids] = torch_rand_float(1.0, 2.0, (len(env_ids), 1), device=self.device).squeeze(1)
+        self.gait_frequency[env_ids] = torch_rand_float(2.0, 2.0, (len(env_ids), 1), device=self.device).squeeze(1)
         still_envs = env_ids[torch.randperm(len(env_ids))[: int(0.1 * len(env_ids))]]
         self.command_generator.command[still_envs, :] = 0.0
         self.gait_frequency[still_envs] = 0.0

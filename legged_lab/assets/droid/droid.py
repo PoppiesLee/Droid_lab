@@ -554,7 +554,7 @@ x3_CFG = ArticulationCfg(
             max_depenetration_velocity=1.0,
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=4
+            enabled_self_collisions=True, solver_position_iteration_count=8, solver_velocity_iteration_count=4
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -584,7 +584,7 @@ x3_CFG = ArticulationCfg(
                 ".*waist_yaw": 45.0
             },
             stiffness={
-                ".*waist_roll": 200.0,
+                ".*waist_roll": 400.0,
                 ".*waist_yaw":  100.0
             },
             damping={
@@ -599,10 +599,10 @@ x3_CFG = ArticulationCfg(
         "legs": ImplicitActuatorCfg(
             joint_names_expr=[".*_hip_roll", ".*_hip_pitch", ".*_hip_yaw", ".*_knee_pitch"],
             effort_limit_sim={
-                ".*_hip_roll": 200.0,
-                ".*_hip_pitch": 200.0,
-                ".*_hip_yaw": 200.0,
-                ".*_knee_pitch": 200.0,
+                ".*_hip_roll": 117.8,
+                ".*_hip_pitch": 72,
+                ".*_hip_yaw": 83.5,
+                ".*_knee_pitch": 190.8,
             },
             velocity_limit_sim={
                 ".*_hip_roll": 30,
