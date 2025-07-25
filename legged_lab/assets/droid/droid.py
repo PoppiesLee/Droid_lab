@@ -584,7 +584,7 @@ x3_CFG = ArticulationCfg(
                 ".*waist_yaw": 45.0
             },
             stiffness={
-                ".*waist_roll": 400.0,
+                ".*waist_roll": 300.0,
                 ".*waist_yaw":  100.0
             },
             damping={
@@ -599,10 +599,10 @@ x3_CFG = ArticulationCfg(
         "legs": ImplicitActuatorCfg(
             joint_names_expr=[".*_hip_roll", ".*_hip_pitch", ".*_hip_yaw", ".*_knee_pitch"],
             effort_limit_sim={
-                ".*_hip_roll": 117.8,
-                ".*_hip_pitch": 72,
+                ".*_hip_roll": 200,
+                ".*_hip_pitch": 200,
                 ".*_hip_yaw": 83.5,
-                ".*_knee_pitch": 190.8,
+                ".*_knee_pitch": 200,
             },
             velocity_limit_sim={
                 ".*_hip_roll": 30,
@@ -611,10 +611,10 @@ x3_CFG = ArticulationCfg(
                 ".*_knee_pitch": 90.38,
             },
             stiffness={
-                ".*_hip_roll": 250.0,
-                ".*_hip_pitch": 250.0,
+                ".*_hip_roll": 300.0,
+                ".*_hip_pitch": 300.0,
                 ".*_hip_yaw": 200.0,
-                ".*_knee_pitch": 250.0,
+                ".*_knee_pitch": 300.0,
             },
             damping={
                 ".*_hip_roll": 5.0,

@@ -38,7 +38,7 @@ class x3RewardCfg(RewardCfg):
     joint_deviation_waist_roll = RewTerm(func=mdp.joint_deviation_l1, weight=-5.0,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*waist_roll"])})
     joint_deviation_waist_yaw = RewTerm(func=mdp.joint_deviation_l1, weight=-5.0,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*waist_yaw"])})
     joint_deviation_hip_yaw = RewTerm(func=mdp.joint_deviation_l1, weight=-0.80,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_hip_yaw"])})
-    joint_deviation_hip_roll = RewTerm(func=mdp.joint_deviation_l1, weight=-0.15,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_hip_roll"])})
+    joint_deviation_hip_roll = RewTerm(func=mdp.joint_deviation_l1, weight=-0.12,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_hip_roll"])})
     # joint_deviation_arms = RewTerm(func=mdp.joint_deviation_l1, weight=-0.2, params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*waist.*", ".*_shoulder_roll.*", ".*_shoulder_yaw.*", ".*_wrist.*"])})
     joint_deviation_legs = RewTerm(func=mdp.joint_deviation_l1, weight=-0.01,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_hip_pitch"])})
     joint_deviation_legs_knee = RewTerm(func=mdp.joint_deviation_l1, weight=-0.01,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_knee.*"])})
