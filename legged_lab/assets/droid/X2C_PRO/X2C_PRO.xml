@@ -149,16 +149,16 @@
     </body>
   </worldbody>
   <actuator>
-    <motor name="L_hip_pitch"     joint="L_hip_pitch"     />
+    <motor name="L_hip_yaw"     joint="L_hip_yaw"     />
     <motor name="L_hip_roll"      joint="L_hip_roll"      />
-    <motor name="L_hip_yaw"       joint="L_hip_yaw"       />
+    <motor name="L_hip_pitch"       joint="L_hip_pitch"       />
     <motor name="L_knee_pitch"    joint="L_knee_pitch"    />
     <motor name="L_ankle_pitch"   joint="L_ankle_pitch"   />
     <motor name="L_ankle_roll"    joint="L_ankle_roll"   />
 
-    <motor name="R_hip_pitch"     joint="R_hip_pitch"     />
+    <motor name="R_hip_yaw"     joint="R_hip_yaw"     />
     <motor name="R_hip_roll"      joint="R_hip_roll"      />
-    <motor name="R_hip_yaw"       joint="R_hip_yaw"       />
+    <motor name="R_hip_pitch"       joint="R_hip_pitch"       />
     <motor name="R_knee_pitch"    joint="R_knee_pitch"    />
     <motor name="R_ankle_pitch"   joint="R_ankle_pitch"   />
     <motor name="R_ankle_roll"    joint="R_ankle_roll"   />
