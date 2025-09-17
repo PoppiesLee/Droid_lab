@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.sensors import ContactSensor
 import isaaclab.utils.math as math_utils
-from isaaclab.utils.math import quat_rotate_inverse, yaw_quat
+from isaaclab.utils.math import quat_apply_inverse, yaw_quat
 from isaaclab.assets import Articulation
 
 if TYPE_CHECKING:
@@ -15,28 +15,28 @@ if TYPE_CHECKING:
 # --body
 def body_orientation_l2(env: BaseEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     asset: Articulation = env.scene[asset_cfg.name]
-    body_orientation = math_utils.quat_rotate_inverse(asset.data.body_quat_w[:, asset_cfg.body_ids[0], :], asset.data.GRAVITY_VEC_W)
+    body_orientation = math_utils.quat_apply_inverse(asset.data.body_quat_w[:, asset_cfg.body_ids[0], :], asset.data.GRAVITY_VEC_W)
     return torch.sum(torch.square(body_orientation[:, :2]), dim=1)
 
 def body_orientation_pitch_l2(
     env:BaseEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
 ) -> torch.Tensor:
     asset: Articulation = env.scene[asset_cfg.name]
-    body_orientation = math_utils.quat_rotate_inverse(asset.data.body_quat_w[:, asset_cfg.body_ids[0], :], asset.data.GRAVITY_VEC_W)
+    body_orientation = math_utils.quat_apply_inverse(asset.data.body_quat_w[:, asset_cfg.body_ids[0], :], asset.data.GRAVITY_VEC_W)
     return torch.sum(torch.square(body_orientation[:, :1]), dim=1)
 
 def body_orientation_roll_l2(
     env:BaseEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
 ) -> torch.Tensor:
     asset: Articulation = env.scene[asset_cfg.name]
-    body_orientation = math_utils.quat_rotate_inverse(asset.data.body_quat_w[:, asset_cfg.body_ids[0], :], asset.data.GRAVITY_VEC_W)
+    body_orientation = math_utils.quat_apply_inverse(asset.data.body_quat_w[:, asset_cfg.body_ids[0], :], asset.data.GRAVITY_VEC_W)
     return torch.sum(torch.square(body_orientation[:, 1:2]), dim=1)
 
 def track_lin_vel_xy_yaw_frame_exp(
     env:BaseEnv, std: float, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
 ) -> torch.Tensor:
     asset: Articulation = env.scene[asset_cfg.name]
-    vel_yaw = math_utils.quat_rotate_inverse(math_utils.yaw_quat(asset.data.root_quat_w), asset.data.root_lin_vel_w[:, :3])
+    vel_yaw = math_utils.quat_apply_inverse(math_utils.yaw_quat(asset.data.root_quat_w), asset.data.root_lin_vel_w[:, :3])
     lin_vel_error = torch.sum(torch.square(env.command_generator.command[:, :2] - vel_yaw[:, :2]), dim=1)
     return torch.exp(-lin_vel_error / std**2)
 
@@ -46,7 +46,7 @@ def track_lin_vel_xy_yaw_frame_exp(
 #     """Reward tracking of linear velocity commands (xy axes) in the gravity aligned robot frame using exponential kernel."""
 #     # extract the used quantities (to enable type-hinting)
 #     asset: Articulation = env.scene[asset_cfg.name]
-#     vel_yaw = quat_rotate_inverse(yaw_quat(asset.data.root_quat_w), asset.data.root_lin_vel_w[:, :3])
+#     vel_yaw = quat_apply_inverse(yaw_quat(asset.data.root_quat_w), asset.data.root_lin_vel_w[:, :3])
 #     lin_vel_error = torch.sum(
 #         torch.square(env.command_manager.get_command(command_name)[:, :2] - vel_yaw[:, :2]), dim=1
 #     )
@@ -325,3 +325,17 @@ def joint_action_l1(
     给稍大一点负权重，它会迅速被“锁”在 0 附近，对小动作敏感
     """
     return torch.sum(torch.abs(env.action[:, asset_cfg.joint_ids]), dim=1)
+
+def torque_limits(env, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"), soft_torque_limit: float = 0.9) -> torch.Tensor:
+    """惩罚扭矩接近限制。"""
+    torques = env.scene[asset_cfg.name].data.applied_torque
+    torque_limits = env.scene[asset_cfg.name].data.joint_effort_limits
+    over_limit = (torch.abs(torques) - torque_limits * soft_torque_limit).clip(min=0.)
+    return torch.sum(over_limit, dim=1)
+
+def dof_vel_limits(env, asset_cfg: SceneEntityCfg = None, soft_dof_vel_limit: float = 0.9) -> torch.Tensor:
+    """惩罚关节速度接近限制。"""
+    dof_vel = env.scene[asset_cfg.name].data.joint_vel
+    dof_vel_limits = env.scene[asset_cfg.name].data.joint_vel_limits
+    over_limit = (torch.abs(dof_vel) - dof_vel_limits * soft_dof_vel_limit).clip(min=0.)
+    return torch.sum(over_limit, dim=1)

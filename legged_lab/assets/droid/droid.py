@@ -746,4 +746,192 @@ X2C_CFG = ArticulationCfg(
     },
 )
 
+# E1_CFG = ArticulationCfg(
+#     spawn=sim_utils.UsdFileCfg(
+#         usd_path=f"{ISAAC_ASSET_DIR}/droid/E1/E1.usd",
+#         # asset_path=f"{ISAAC_ASSET_DIR}/droid/E1/E1.urdf",
+#         # usd_path=f"{ISAAC_ASSET_DIR}/droid/x2rw10/x2rw10.usd",
+#         activate_contact_sensors=True,
+#         rigid_props=sim_utils.RigidBodyPropertiesCfg(
+#             disable_gravity=False,
+#             retain_accelerations=False,
+#             linear_damping=0.0,
+#             angular_damping=0.0,
+#             max_linear_velocity=1000.0,
+#             max_angular_velocity=1000.0,
+#             max_depenetration_velocity=1.0,
+#         ),
+#         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
+#             enabled_self_collisions=True, solver_position_iteration_count=8, solver_velocity_iteration_count=4
+#         ),
+#     ),
+#     init_state=ArticulationCfg.InitialStateCfg(
+#         pos=(0.0, 0.0, 0.553),
+#         joint_pos={
+#             ".*_hip_pitch_joint": -0.30,
+#             ".*_hip_roll_joint": 0.0,     # 2 deg
+#             ".*_hip_yaw_joint": 0.00,    # 12 deg
+#             ".*_knee_joint": 0.60,  # -24 deg
+#             ".*_ankle_roll_joint": 0.00,  #  13 deg
+#             ".*_ankle_pitch_joint": -0.30,
+#         },
+#         joint_vel={".*": 0.0},
+#     ),
+#     soft_joint_pos_limit_factor=0.9,
+#     actuators={
+#         "legs": ImplicitActuatorCfg(
+#             joint_names_expr=[".*_hip_roll_joint", ".*_hip_pitch_joint", ".*_hip_yaw_joint", ".*_knee_joint"],
+#             effort_limit_sim={
+#                 ".*_hip_roll_joint": 60.0,
+#                 ".*_hip_pitch_joint": 60.0,
+#                 ".*_hip_yaw_joint": 14.0,
+#                 ".*_knee_joint": 28.0
+#             },
+#             velocity_limit_sim={
+#                 ".*_hip_roll_joint": 90,
+#                 ".*_hip_pitch_joint": 97.5,
+#                 ".*_hip_yaw_joint": 43,
+#                 ".*_knee_joint": 90.38,
+#             },
+#             stiffness={
+#                 ".*_hip_roll_joint": 100.0,
+#                 ".*_hip_pitch_joint": 100.0,
+#                 ".*_hip_yaw_joint": 30.0,
+#                 ".*_knee_joint": 100.0,
+#             },
+#             damping={
+#                 ".*_hip_roll_joint": 4.0,
+#                 ".*_hip_pitch_joint": 4.0,
+#                 ".*_hip_yaw_joint": 2.0,
+#                 ".*_knee_joint": 4.0,
+#             },
+#             armature={
+#                 ".*_hip_roll_joint": 0.01,
+#                 ".*_hip_pitch_joint": 0.01,
+#                 ".*_hip_yaw_joint": 0.01,
+#                 ".*_knee_joint": 0.01,
+#             },
+#         ),
+#         "feet": ImplicitActuatorCfg(
+#             joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
+#             effort_limit_sim={
+#                 ".*_ankle_pitch_joint": 14.0,
+#                 ".*_ankle_roll_joint": 14.0
+#             },
+#             velocity_limit_sim={
+#                 ".*_ankle_pitch_joint": 100,
+#                 ".*_ankle_roll_joint": 100
+#             },
+#             stiffness={
+#                 ".*_ankle_pitch_joint": 20.0,
+#                 ".*_ankle_roll_joint": 40.0
+#             },
+#             damping={
+#                 ".*_ankle_pitch_joint": 3.0,
+#                 ".*_ankle_roll_joint": 2.0,
+#             },
+#             armature={
+#                 ".*_ankle_pitch_joint": 0.01,
+#                 ".*_ankle_roll_joint": 0.01
+#             },
+#         ),
+#     },
+# )
+
+E1_CFG = ArticulationCfg(
+    spawn=sim_utils.UrdfFileCfg(
+        # usd_path=f"{ISAAC_ASSET_DIR}/droid/E1/E1.usd",
+        asset_path=f"{ISAAC_ASSET_DIR}/droid/E1/E1.urdf",
+        fix_base=False,  # 不固定机器人基座
+        replace_cylinders_with_capsules=True,
+        activate_contact_sensors=True,
+        rigid_props=sim_utils.RigidBodyPropertiesCfg(
+            disable_gravity=False,
+            retain_accelerations=False,
+            linear_damping=0.0,
+            angular_damping=0.0,
+            max_linear_velocity=1000.0,
+            max_angular_velocity=1000.0,
+            max_depenetration_velocity=1.0,
+        ),
+        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
+            enabled_self_collisions=True, solver_position_iteration_count=8, solver_velocity_iteration_count=4
+        ),
+        joint_drive=sim_utils.UrdfConverterCfg.JointDriveCfg(
+            gains=sim_utils.UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=0, damping=0)  # 关节驱动增益(初始化为0)
+        ),
+    ),
+    init_state=ArticulationCfg.InitialStateCfg(
+        pos=(0.0, 0.0, 0.553),
+        joint_pos={
+            ".*_hip_pitch_joint": -0.20,
+            ".*_hip_roll_joint": 0.0,     # 2 deg
+            ".*_hip_yaw_joint": 0.00,    # 12 deg
+            ".*_knee_joint": 0.40,  # -24 deg
+            ".*_ankle_roll_joint": 0.00,  #  13 deg
+            ".*_ankle_pitch_joint": -0.20,
+        },
+        joint_vel={".*": 0.0},
+    ),
+    soft_joint_pos_limit_factor=0.9,
+    actuators={
+        "legs": ImplicitActuatorCfg(
+            joint_names_expr=[".*_hip_roll_joint", ".*_hip_pitch_joint", ".*_hip_yaw_joint", ".*_knee_joint"],
+            effort_limit_sim={
+                ".*_hip_roll_joint": 60.0,
+                ".*_hip_pitch_joint": 60.0,
+                ".*_hip_yaw_joint": 14.0,
+                ".*_knee_joint": 56.0
+            },
+            velocity_limit_sim={
+                ".*_hip_roll_joint": 180.0,
+                ".*_hip_pitch_joint": 180.0,
+                ".*_hip_yaw_joint": 260.0,
+                ".*_knee_joint": 260.0,
+            },
+            stiffness={
+                ".*_hip_roll_joint": 100.0,
+                ".*_hip_pitch_joint": 100.0,
+                ".*_hip_yaw_joint": 30.0,
+                ".*_knee_joint": 100.0,
+            },
+            damping={
+                ".*_hip_roll_joint": 3.0,
+                ".*_hip_pitch_joint": 3.0,
+                ".*_hip_yaw_joint": 2.0,
+                ".*_knee_joint": 3.0,
+            },
+            armature={
+                ".*_hip_roll_joint": 0.01,
+                ".*_hip_pitch_joint": 0.01,
+                ".*_hip_yaw_joint": 0.01,
+                ".*_knee_joint": 0.01,
+            },
+        ),
+        "feet": ImplicitActuatorCfg(
+            joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
+            effort_limit_sim={
+                ".*_ankle_pitch_joint": 30.0,
+                ".*_ankle_roll_joint": 30.0
+            },
+            velocity_limit_sim={
+                ".*_ankle_pitch_joint": 260,
+                ".*_ankle_roll_joint": 260
+            },
+            stiffness={
+                ".*_ankle_pitch_joint": 20.0,
+                ".*_ankle_roll_joint": 40.0
+            },
+            damping={
+                ".*_ankle_pitch_joint": 3.0,
+                ".*_ankle_roll_joint": 2.0,
+            },
+            armature={
+                ".*_ankle_pitch_joint": 0.01,
+                ".*_ankle_roll_joint": 0.01
+            },
+        ),
+    },
+)
+
 """Configuration for the Droid X2R Humanoid robot."""
