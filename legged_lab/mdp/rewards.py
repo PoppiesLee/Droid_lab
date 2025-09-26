@@ -333,7 +333,7 @@ def torque_limits(env, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"), soft
     over_limit = (torch.abs(torques) - torque_limits * soft_torque_limit).clip(min=0.)
     return torch.sum(over_limit, dim=1)
 
-def dof_vel_limits(env, asset_cfg: SceneEntityCfg = None, soft_dof_vel_limit: float = 0.9) -> torch.Tensor:
+def dof_vel_limits(env, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"), soft_dof_vel_limit: float = 0.9) -> torch.Tensor:
     """惩罚关节速度接近限制。"""
     dof_vel = env.scene[asset_cfg.name].data.joint_vel
     dof_vel_limits = env.scene[asset_cfg.name].data.joint_vel_limits

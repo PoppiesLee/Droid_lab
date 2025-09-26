@@ -862,14 +862,14 @@ E1_CFG = ArticulationCfg(
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.0, 0.0, 0.553),
+        pos=(0.0, 0.0, 0.5132),
         joint_pos={
-            ".*_hip_pitch_joint": -0.20,
+            ".*_hip_pitch_joint": -0.39,
             ".*_hip_roll_joint": 0.0,     # 2 deg
             ".*_hip_yaw_joint": 0.00,    # 12 deg
-            ".*_knee_joint": 0.40,  # -24 deg
+            ".*_knee_joint": 0.78,  # -24 deg
             ".*_ankle_roll_joint": 0.00,  #  13 deg
-            ".*_ankle_pitch_joint": -0.20,
+            ".*_ankle_pitch_joint": -0.39,
         },
         joint_vel={".*": 0.0},
     ),
@@ -881,13 +881,13 @@ E1_CFG = ArticulationCfg(
                 ".*_hip_roll_joint": 60.0,
                 ".*_hip_pitch_joint": 60.0,
                 ".*_hip_yaw_joint": 14.0,
-                ".*_knee_joint": 56.0
+                ".*_knee_joint": 28.0
             },
             velocity_limit_sim={
-                ".*_hip_roll_joint": 180.0,
-                ".*_hip_pitch_joint": 180.0,
-                ".*_hip_yaw_joint": 260.0,
-                ".*_knee_joint": 260.0,
+                ".*_hip_roll_joint": 18.85,
+                ".*_hip_pitch_joint": 18.85,
+                ".*_hip_yaw_joint": 27.28,
+                ".*_knee_joint": 27.28,
             },
             stiffness={
                 ".*_hip_roll_joint": 100.0,
@@ -899,7 +899,7 @@ E1_CFG = ArticulationCfg(
                 ".*_hip_roll_joint": 3.0,
                 ".*_hip_pitch_joint": 3.0,
                 ".*_hip_yaw_joint": 2.0,
-                ".*_knee_joint": 3.0,
+                ".*_knee_joint": 2.0,
             },
             armature={
                 ".*_hip_roll_joint": 0.01,
@@ -911,16 +911,16 @@ E1_CFG = ArticulationCfg(
         "feet": ImplicitActuatorCfg(
             joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
             effort_limit_sim={
-                ".*_ankle_pitch_joint": 30.0,
-                ".*_ankle_roll_joint": 30.0
+                ".*_ankle_pitch_joint": 28.0,
+                ".*_ankle_roll_joint": 28.0
             },
             velocity_limit_sim={
-                ".*_ankle_pitch_joint": 260,
-                ".*_ankle_roll_joint": 260
+                ".*_ankle_pitch_joint": 27.28,
+                ".*_ankle_roll_joint": 27.28
             },
             stiffness={
                 ".*_ankle_pitch_joint": 20.0,
-                ".*_ankle_roll_joint": 40.0
+                ".*_ankle_roll_joint": 30.0
             },
             damping={
                 ".*_ankle_pitch_joint": 3.0,

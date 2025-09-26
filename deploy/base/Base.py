@@ -123,6 +123,15 @@ def set_joint_mode(command, config, num_actions):
         command.kd[idx] = config.dof_damping[idx]
         command.max_torque[idx] = config.effort_limit[idx]
 
+def set_joint_mode_E1(command, config, num_actions):
+    command.cmd_enable = 2
+    num_motors = num_actions
+    joint_to_motor_map = [0, 1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 9, 10, 11]
+    for motor_idx in range(num_motors):
+        joint_idx = joint_to_motor_map[motor_idx]
+        command.kp[motor_idx] = config.dof_stiffness[joint_idx]
+        command.kd[motor_idx] = config.dof_damping[joint_idx]
+        command.max_torque[motor_idx] = config.effort_limit[joint_idx]
 
 def print_configs(config):
     idx_max = len(config.joint_name)

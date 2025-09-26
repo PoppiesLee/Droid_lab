@@ -17,7 +17,7 @@ import pickle
 
 onnx_mode_path = f"policies/policy.onnx"
 mujoco_model_path = f"../legged_lab/assets/droid/E1/scene.xml"
-MAX_LINE_VEL  = 0.8
+MAX_LINE_VEL  = 2.0
 MAX_ANGLE_VEL = 0.5
 
 #                           0            1            2              3               4                5               6            7            8              9
