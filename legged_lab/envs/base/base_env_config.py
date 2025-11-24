@@ -112,7 +112,7 @@ class BaseEnvCfg:
             enable=True,
             params={
                 "body_names": MISSING,
-                "mass_distribution_params": (-5.0, 5.0),
+                "mass_distribution_params": (-1.8, 1.8),
                 "operation": "add",
             }
         ),

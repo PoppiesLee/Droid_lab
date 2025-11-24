@@ -125,13 +125,32 @@ def set_joint_mode(command, config, num_actions):
 
 def set_joint_mode_E1(command, config, num_actions):
     command.cmd_enable = 2
-    num_motors = num_actions
-    joint_to_motor_map = [0, 1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 9, 10, 11]
-    for motor_idx in range(num_motors):
-        joint_idx = joint_to_motor_map[motor_idx]
-        command.kp[motor_idx] = config.dof_stiffness[joint_idx]
-        command.kd[motor_idx] = config.dof_damping[joint_idx]
-        command.max_torque[motor_idx] = config.effort_limit[joint_idx]
+    command.kp[0:3] =   config.dof_stiffness[0:3]
+    command.kp[3] =     config.dof_stiffness[3]
+    command.kp[4] =     config.dof_stiffness[3]
+    command.kp[5:7] =   config.dof_stiffness[4:6]
+    command.kp[7:10] =  config.dof_stiffness[6:9]
+    command.kp[10] =    config.dof_stiffness[9]
+    command.kp[11] =    config.dof_stiffness[9]
+    command.kp[12:14] = config.dof_stiffness[10:12]
+
+    command.kd[0:3] =   config.dof_damping[0:3]
+    command.kd[3] =     config.dof_damping[3]
+    command.kd[4] =     config.dof_damping[3]
+    command.kd[5:7] =   config.dof_damping[4:6]
+    command.kd[7:10] =  config.dof_damping[6:9]
+    command.kd[10] =    config.dof_damping[9]
+    command.kd[11] =    config.dof_damping[9]
+    command.kd[12:14] = config.dof_damping[10:12]
+
+    command.max_torque[0:3] =   config.effort_limit[0:3]
+    command.max_torque[3] =     config.effort_limit[3]
+    command.max_torque[4] =     config.effort_limit[3]
+    command.max_torque[5:7] =   config.effort_limit[4:6]
+    command.max_torque[7:10] =  config.effort_limit[6:9]
+    command.max_torque[10] =    config.effort_limit[9]
+    command.max_torque[11] =    config.effort_limit[9]
+    command.max_torque[12:14] = config.effort_limit[10:12]
 
 def print_configs(config):
     idx_max = len(config.joint_name)

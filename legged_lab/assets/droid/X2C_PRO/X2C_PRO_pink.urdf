@@ -8,11 +8,11 @@
     <compiler meshdir="./meshes" discardvisual="false" />
   </mujoco>
 
-<!--  <link name="world"></link>-->
-<!--  <joint name="pelvis_link" type="floating">-->
-<!--    <parent link="world" />-->
-<!--    <child link="pelvis_link" />-->
-<!--  </joint>-->
+  <link name="world"></link>
+  <joint name="pelvis_link" type="floating">
+    <parent link="world" />
+    <child link="pelvis_link" />
+  </joint>
 
   <link name="pelvis_link">
     <inertial>
@@ -54,7 +54,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_hip_yaw_link.STL" />-->
+<!--        <mesh filename="meshes1/L_hip_yaw_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
   </link>
@@ -199,7 +199,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_ankle_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/L_ankle_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
     <collision>
@@ -264,7 +264,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_hip_yaw_link.STL" />-->
+<!--        <mesh filename="meshes1/R_hip_yaw_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
   </link>
@@ -409,7 +409,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_ankle_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/R_ankle_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
      <collision>

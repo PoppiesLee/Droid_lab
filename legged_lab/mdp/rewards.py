@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import torch
+import math
 from typing import TYPE_CHECKING
 
 from isaaclab.managers import SceneEntityCfg

@@ -59,7 +59,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_hip_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/L_hip_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
   </link>
@@ -93,7 +93,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_hip_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/L_hip_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
   </link>
@@ -229,7 +229,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_ankle_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/L_ankle_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
     <collision>
@@ -294,7 +294,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_hip_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/R_hip_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
   </link>
@@ -323,7 +323,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_hip_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/R_hip_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
   </link>
@@ -444,7 +444,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_ankle_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/R_ankle_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
     <collision>
@@ -509,7 +509,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/waist_yaw_link.STL" />-->
+<!--        <mesh filename="meshes1/waist_yaw_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
   </link>
@@ -538,7 +538,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/waist_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/waist_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
   </link>
@@ -586,7 +586,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_shoulder_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/L_shoulder_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -595,7 +595,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_shoulder_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/L_shoulder_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -615,7 +615,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_shoulder_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/L_shoulder_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -624,7 +624,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_shoulder_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/L_shoulder_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -644,7 +644,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_shoulder_yaw_link.STL" />-->
+<!--        <mesh filename="meshes1/L_shoulder_yaw_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -653,7 +653,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_shoulder_yaw_link.STL" />-->
+<!--        <mesh filename="meshes1/L_shoulder_yaw_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -673,7 +673,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_elbow_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/L_elbow_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -682,7 +682,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_elbow_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/L_elbow_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -702,7 +702,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_elbow_yaw_link.STL" />-->
+<!--        <mesh filename="meshes1/L_elbow_yaw_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -711,7 +711,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_elbow_yaw_link.STL" />-->
+<!--        <mesh filename="meshes1/L_elbow_yaw_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -731,7 +731,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_wrist_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/L_wrist_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -740,7 +740,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_wrist_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/L_wrist_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -760,7 +760,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_wrist_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/L_wrist_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -769,7 +769,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/L_wrist_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/L_wrist_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -789,7 +789,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_shoulder_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/R_shoulder_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -798,7 +798,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_shoulder_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/R_shoulder_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -818,7 +818,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_shoulder_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/R_shoulder_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -827,7 +827,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_shoulder_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/R_shoulder_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -847,7 +847,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_shoulder_yaw_link.STL" />-->
+<!--        <mesh filename="meshes1/R_shoulder_yaw_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -856,7 +856,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_shoulder_yaw_link.STL" />-->
+<!--        <mesh filename="meshes1/R_shoulder_yaw_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -876,7 +876,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_elbow_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/R_elbow_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -885,7 +885,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_elbow_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/R_elbow_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -905,7 +905,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_elbow_yaw_link.STL" />-->
+<!--        <mesh filename="meshes1/R_elbow_yaw_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -914,7 +914,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_elbow_yaw_link.STL" />-->
+<!--        <mesh filename="meshes1/R_elbow_yaw_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -934,7 +934,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_wrist_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/R_wrist_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -943,7 +943,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_wrist_pitch_link.STL" />-->
+<!--        <mesh filename="meshes1/R_wrist_pitch_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->
@@ -963,7 +963,7 @@
 <!--    <visual>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_wrist_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/R_wrist_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--      <material name="">-->
 <!--        <color rgba="1 1 1 1" />-->
@@ -972,7 +972,7 @@
 <!--    <collision>-->
 <!--      <origin xyz="0 0 0" rpy="0 0 0" />-->
 <!--      <geometry>-->
-<!--        <mesh filename="meshes/R_wrist_roll_link.STL" />-->
+<!--        <mesh filename="meshes1/R_wrist_roll_link.STL" />-->
 <!--      </geometry>-->
 <!--    </collision>-->
 <!--  </link>-->

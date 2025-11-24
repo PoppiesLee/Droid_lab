@@ -66,17 +66,18 @@ class LegBase:
             timer.waiting(start_time)
 
     def testLeg(self):
-        T = 0.7  # 总时间
+        T = 1.0  # 总时间
         dt0 = np.zeros(self.legActions)
         dt1 = np.zeros(self.legActions)
         dt2 = np.zeros(self.legActions)
         D2R = math.pi / 180.0
-        # dt1 = [0, 0,   0,  20*D2R,  0,   0, 0,    0,  -20*D2R,  0,   0, 0]
-        # dt2 = [0, 0,   0,  -20*D2R,  0,   0, 0,    0,  20*D2R,  0,   0, 0]
+               #  pitch   roll    yaw     knee  A_pitch  A_roll       pitch   roll     yaw    knee   A_pitch   A_roll
+        dt1 = [  0*D2R,  0*D2R,  30*D2R,  0*D2R,  0*D2R,  0*D2R,       0*D2R,  0*D2R, -30*D2R,  0*D2R,  0*D2R,   0*D2R]
+        dt2 = [  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,       0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R]
              #   pitch   roll    yaw       knee1    knee2    A_roll  A_pitch      pitch    roll      yaw     knee1     knee2    A_roll    A_pitch
-        dt1 = [-30*D2R,   0,   0*D2R,     60*D2R,  60*D2R,     0,    -30*D2R,    -30*D2R,    0,       0,    60*D2R,    60*D2R,     0,    -30*D2R]
-        dt2 = [ 0,      0,       0,         0,       0,       0,        0,     0,      0,       0,        0,        0,       0,         0]
-        for i in range(14):
+        # dt1 = [-30*D2R,   0,     0,     60*D2R,  60*D2R,      0,    -30*D2R,    -30*D2R,    0,       0,    60*D2R,    60*D2R,     0,    -30*D2R]
+        # dt2 = [ 0,      0,       0,         0,       0,       0,        0,     0,      0,       0,        0,        0,       0,         0]
+        for i in range(12):
             dt0[i] = dt0[i]
             dt1[i] = dt1[i]
             dt2[i] = dt2[i]
@@ -87,8 +88,10 @@ class LegBase:
             gBot.get_leg_state()
             # print(gBot.legState.position[1],gBot.legState.position[2])
             print("wave round %d" % (i * 2 + 1))
+            # print(self.legState.abs_encoder)
             self.set_leg_path(T, dt1)
             print("wave round %d" % (i * 2 + 2))
+            # print(self.legState.abs_encoder)
             self.set_leg_path(T, dt2)
         print("return to zero")
         self.set_leg_path(T, dt0)
