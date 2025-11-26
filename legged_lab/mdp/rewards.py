@@ -266,18 +266,52 @@ def feet_too_near_humanoid(env: BaseEnv, asset_cfg: SceneEntityCfg = SceneEntity
     distance = torch.norm(feet_pos[:, 0] - feet_pos[:, 1], dim=-1)
     return (threshold - distance).clamp(min=0)
 
-def feet_height(env: BaseEnv, sensor_cfg: SceneEntityCfg, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
-    assert len(asset_cfg.body_ids) == 2
+def feet_height(
+    env: BaseEnv,
+    sensor_cfg: SceneEntityCfg,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    # 分开拿 robot 和 sensor 的 body 索引
+    body_ids_robot = asset_cfg.body_ids
+    body_ids_sensor = sensor_cfg.body_ids
+
+    assert len(body_ids_robot) == 2
+    assert len(body_ids_sensor) == 2
+
     asset: Articulation = env.scene[asset_cfg.name]
     contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
 
-    # 判断是否在摆动期（未接触地面）
-    in_air = contact_sensor.data.current_contact_time[:, asset_cfg.body_ids] <= 0.0
-    feet_z = asset.data.body_pos_w[:, asset_cfg.body_ids, 2]
+    in_air = contact_sensor.data.current_contact_time[:, body_ids_sensor] <= 0.0
 
-    # 只奖励摆动期的脚抬高程度
-    lift_amount = torch.square(feet_z - 0.20)
-    reward = (in_air.float() * lift_amount).sum(dim=1)
+    # ankle_roll_link 的世界位置和姿态（用 robot 的 body_ids）
+    feet_pos = asset.data.body_pos_w[:, body_ids_robot, :]    # (N, 2, 3)
+    feet_quat = asset.data.body_quat_w[:, body_ids_robot, :]  # (N, 2, 4)，假设 (w,x,y,z)
+
+    def quat_apply(q: torch.Tensor, v: torch.Tensor) -> torch.Tensor:
+        q_w = q[..., 0:1]
+        q_xyz = q[..., 1:]
+        t = 2.0 * torch.cross(q_xyz, v, dim=-1)
+        return v + q_w * t + torch.cross(q_xyz, t, dim=-1)
+
+    # === 1. 脚底点的世界高度 ===
+    # 从 URDF：collision origin (0.02,0,-0.02), box 高 0.04 → 底面 z = -0.04
+    local_bottom = torch.tensor(
+        [0.02, 0.0, -0.04],
+        device=feet_pos.device,
+        dtype=feet_pos.dtype,
+    ).view(1, 1, 3).expand_as(feet_pos)
+
+    sole_pos = quat_apply(feet_quat, local_bottom) + feet_pos
+    foot_height = sole_pos[..., 2]  # (N, 2)
+
+    h_des = 0.06   # 期望脚底离地高度（8cm）
+    sigma = 0.02   # 容忍偏差
+
+    err = (foot_height - h_des) / sigma
+    height_reward = torch.clamp(1.0 - err**2, min=0.0)  # (N,2) ∈ [0,1]
+
+    # 最终 reward：摆动期 * 高度奖励，两条腿求和
+    reward = (in_air.float() * height_reward).sum(dim=1)
     return reward
 
 def feet_swing(env: BaseEnv, sensor_cfg: SceneEntityCfg) -> torch.Tensor:

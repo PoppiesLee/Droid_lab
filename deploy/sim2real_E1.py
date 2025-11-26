@@ -13,9 +13,9 @@ from base.Base import NanoSleep, euler_to_quaternion, quat_rotate_inverse
 
 onnx_mode_path = f"policies/policy.onnx"
 
-IsaacLabJointOrder = ['left_hip_pitch_joint', 'right_hip_pitch_joint', 'left_hip_roll_joint', 'right_hip_roll_joint', 'left_hip_yaw_joint', 'right_hip_yaw_joint', 'left_knee_joint', 'right_knee_joint', 'left_ankle_pitch_joint', 'right_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_ankle_roll_joint']
-RealJointOrder = ['left_hip_pitch_joint', 'left_hip_roll_joint', 'left_hip_yaw_joint', 'left_knee_joint', 'left_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_hip_pitch_joint', 'right_hip_roll_joint', 'right_hip_yaw_joint', 'right_knee_joint', 'right_ankle_pitch_joint', 'right_ankle_roll_joint']
-# 找到 IsaacLabJointOrder 中每个关节在 MujocoJointOrder 中的索引
+IsaacLabJointOrder = ['left_hip_pitch_joint', 'right_hip_pitch_joint', 'waist_yaw_joint', 'left_hip_roll_joint', 'right_hip_roll_joint', 'left_hip_yaw_joint', 'right_hip_yaw_joint', 'left_knee_joint', 'right_knee_joint', 'left_ankle_pitch_joint', 'right_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_ankle_roll_joint']
+RealJointOrder = ['left_hip_pitch_joint', 'left_hip_roll_joint', 'left_hip_yaw_joint', 'left_knee_joint', 'left_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_hip_pitch_joint', 'right_hip_roll_joint', 'right_hip_yaw_joint', 'right_knee_joint', 'right_ankle_pitch_joint', 'right_ankle_roll_joint', 'waist_yaw_joint']
+# 找到 IsaacLabJointOrder 中每个关节在 MujocoJointOrder 中的索引-30*D2R,  0*D2R,  0*D2R,  60*D2R, -30*D2R,  0*D2R
 # Mujoco_to_Isaac_indices = [MujocoJointOrder.index(joint) for joint in IsaacLabJointOrder]
 Isaac_to_Real_indices = [IsaacLabJointOrder.index(joint) for joint in RealJointOrder]
 # 找到 MujocoJointOrder 中每个关节在 IsaacLabJointOrder 中的索引
@@ -25,8 +25,8 @@ Real_to_Isaac_indices = [RealJointOrder.index(joint) for joint in IsaacLabJointO
 class Sim2Real(LegBase):
     def __init__(self):
         LegBase.__init__(self)
-        self.num_actions = 12
-        self.num_observations = 47
+        self.num_actions = 13
+        self.num_observations = 50
         self.gait_frequency = 0
         self.cfg = load_configuration("policies/env_cfg.json", RealJointOrder)
         self.run_flag = True
@@ -61,7 +61,7 @@ class Sim2Real(LegBase):
         if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
             self.gait_frequency = 0
         else:
-            self.gait_frequency = 1.0
+            self.gait_frequency = 1.5
 
     def get_obs(self, gait_process):
         q = np.array(self.legState.position)
@@ -82,9 +82,9 @@ class Sim2Real(LegBase):
         obs[6:9] = self.command
         obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
         obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
-        obs[11: 23] = (q- self.cfg.default_joints)[Real_to_Isaac_indices]
-        obs[23: 35] = dq[Real_to_Isaac_indices]
-        obs[35: 47] = self.action[Real_to_Isaac_indices]
+        obs[11: 24] = (q- self.cfg.default_joints)[Real_to_Isaac_indices]
+        obs[24: 37] = dq[Real_to_Isaac_indices]
+        obs[37: 50] = self.action[Real_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
         return q, dq, obs
 
@@ -101,7 +101,7 @@ class Sim2Real(LegBase):
         duration_millisecond = duration_second * 1000  # 单位：ms
         timer = NanoSleep(duration_millisecond)  # 创建一个decimation毫秒的NanoSleep对象
         pbar = tqdm(range(int(0xfffffff0 / duration_second)),
-                    desc="X03 running...")  # x * 0.001, ms -> s
+                    desc="E1 running...")  # x * 0.001, ms -> s
         start = time.perf_counter()
         for _ in pbar:
             start_time = time.perf_counter()

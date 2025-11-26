@@ -910,7 +910,7 @@ E1_CFG = ArticulationCfg(
             },
             stiffness={
                 ".*_hip_pitch_joint": 200.0,
-                ".*_hip_roll_joint": 200.0,
+                ".*_hip_roll_joint": 100.0,
                 ".*_hip_yaw_joint": 100.0,
                 ".*_knee_joint": 200.0,
             },
@@ -938,11 +938,11 @@ E1_CFG = ArticulationCfg(
                 ".*_ankle_roll_joint": 32.987
             },
             stiffness={
-                ".*_ankle_pitch_joint": 100.0,
-                ".*_ankle_roll_joint": 50.0
+                ".*_ankle_pitch_joint": 30.0,
+                ".*_ankle_roll_joint": 30.0
             },
             damping={
-                ".*_ankle_pitch_joint": 5.0,
+                ".*_ankle_pitch_joint": 2.0,
                 ".*_ankle_roll_joint": 2.0,
             },
             armature={
