@@ -8,6 +8,7 @@ from legged_lab.envs.droid.x2_config import X2FlatEnvCfg, X2RoughEnvCfg, X2FlatA
 from legged_lab.envs.droid.x2r_config import X2RFlatEnvCfg, X2RRoughEnvCfg, X2RFlatAgentCfg, X2RRoughAgentCfg
 from legged_lab.envs.droid.x2c_config import X2CFlatEnvCfg, X2CRoughEnvCfg, X2CFlatAgentCfg, X2CRoughAgentCfg
 from legged_lab.envs.droid.E1_config import E1FlatEnvCfg, E1RoughEnvCfg, E1FlatAgentCfg, E1RoughAgentCfg
+from legged_lab.envs.droid.G1_config import G1FlatEnvCfg, G1RoughEnvCfg, G1FlatAgentCfg, G1RoughAgentCfg
 from legged_lab.envs.anymal_d.anymal_d_config import AnymalDFlatEnvCfg, AnymalDRoughEnvCfg, AnymalDFlatAgentCfg, AnymalDRoughAgentCfg
 from legged_lab.utils.task_registry import task_registry
 
@@ -27,5 +28,7 @@ task_registry.register("X2C_flat", BaseEnv, X2CFlatEnvCfg(), X2CFlatAgentCfg())
 task_registry.register("X2C_rough", BaseEnv, X2CRoughEnvCfg(), X2CRoughAgentCfg())
 task_registry.register("E1_flat", BaseEnv, E1FlatEnvCfg(), E1FlatAgentCfg())
 task_registry.register("E1_rough", BaseEnv, E1RoughEnvCfg(), E1RoughAgentCfg())
+task_registry.register("G1_flat", BaseEnv, G1FlatEnvCfg(), G1FlatAgentCfg())
+task_registry.register("G1_rough", BaseEnv, G1RoughEnvCfg(), G1RoughAgentCfg())
 task_registry.register("anymal_d_flat", BaseEnv, AnymalDFlatEnvCfg(), AnymalDFlatAgentCfg())
 task_registry.register("anymal_d_rough", BaseEnv, AnymalDRoughEnvCfg(), AnymalDRoughAgentCfg())

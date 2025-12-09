@@ -281,7 +281,7 @@ def feet_height(
     asset: Articulation = env.scene[asset_cfg.name]
     contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
 
-    in_air = contact_sensor.data.current_contact_time[:, body_ids_sensor] <= 0.0
+    in_air = contact_sensor.data.current_contact_time[:, body_ids_sensor] < 0.0
 
     # ankle_roll_link 的世界位置和姿态（用 robot 的 body_ids）
     feet_pos = asset.data.body_pos_w[:, body_ids_robot, :]    # (N, 2, 3)
@@ -293,26 +293,44 @@ def feet_height(
         t = 2.0 * torch.cross(q_xyz, v, dim=-1)
         return v + q_w * t + torch.cross(q_xyz, t, dim=-1)
 
-    # === 1. 脚底点的世界高度 ===
-    # 从 URDF：collision origin (0.02,0,-0.02), box 高 0.04 → 底面 z = -0.04
-    local_bottom = torch.tensor(
-        [0.02, 0.0, -0.04],
+    # -----------------------------
+    # 2. 脚底高度：从“底面某点”改成“脚底几何中心”
+    # -----------------------------
+    # URDF：collision origin (0.02, 0, -0.02)，box 高 0.04
+    #   - 原来用底面 z = -0.04，那只要绕某个边旋转（踮脚尖）也会抬高这个点；
+    #   - 现在改成脚底几何中心：z = -0.02，要求整个脚抬起来才能有明显高度。
+    local_sole_center = torch.tensor(
+        [0.02, 0.0, -0.02],
         device=feet_pos.device,
         dtype=feet_pos.dtype,
     ).view(1, 1, 3).expand_as(feet_pos)
 
-    sole_pos = quat_apply(feet_quat, local_bottom) + feet_pos
+    sole_pos = quat_apply(feet_quat, local_sole_center) + feet_pos
     foot_height = sole_pos[..., 2]  # (N, 2)
 
-    h_des = 0.06   # 期望脚底离地高度（8cm）
+    # -----------------------------
+    # 3. 高度奖励：仍然是高斯型，只加一个“太低不给”的门槛
+    # -----------------------------
+    h_des = 0.06   # 期望脚底离地高度（6cm）
     sigma = 0.02   # 容忍偏差
 
     err = (foot_height - h_des) / sigma
-    height_reward = torch.clamp(1.0 - err**2, min=0.0)  # (N,2) ∈ [0,1]
+    height_reward = 1.0 - err**2
+    height_reward = torch.clamp(height_reward, min=0.0)  # (N,2) ∈ [0,1]
 
-    # 最终 reward：摆动期 * 高度奖励，两条腿求和
+    # 轻微门槛：脚底高度 < 3cm 就认为没真正抬起来，直接不给这部分高斯奖励
+    #（只是对 height_reward 做 mask，没有新加 reward 项）
+    min_lift = 0.03
+    low_mask = (foot_height > min_lift).float()
+    height_reward = height_reward * low_mask
+
+    # -----------------------------
+    # 4. 和原来一样：空中 × 高度奖励，两条腿求和
+    # -----------------------------
     reward = (in_air.float() * height_reward).sum(dim=1)
     return reward
+
+
 
 def feet_swing(env: BaseEnv, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
     left_swing = (torch.abs(env.gait_process - 0.25) < 0.5 * 0.2) & (env.gait_frequency > 1.0e-8)

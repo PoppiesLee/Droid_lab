@@ -3,12 +3,6 @@
     <compiler meshdir="./meshes" discardvisual="false" />
   </mujoco>
 
-<!--  <link name="world"></link>-->
-<!--  <joint name="pelvis" type="floating">-->
-<!--    <parent link="world" />-->
-<!--    <child link="pelvis" />-->
-<!--  </joint>-->
-
   <link name="pelvis">
     <inertial>
       <origin xyz="-1.83413794531939E-07 2.98943988592675E-07 0.0134170656558657" rpy="0 0 0" />
@@ -401,7 +395,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="waist_yaw_joint" type="fixed">
+  <joint name="waist_yaw_joint" type="revolute">
     <origin xyz="0 0 0.111" rpy="0 0 0" />
     <parent link="pelvis" />
     <child link="waist_yaw_link" />

@@ -29,9 +29,9 @@ class LegBase:
         self.get_leg_state()
         set_joint_mode(self.legCommand, self.LegEnvCfg, self.legActions)
 
-        self.joint_time_logs = [[] for _ in range(self.legActions)]
-        self.joint_qt_logs = [[] for _ in range(self.legActions)]
-        self.joint_qc_logs = [[] for _ in range(self.legActions)]
+        # self.joint_time_logs = [[] for _ in range(self.legActions)]
+        # self.joint_qt_logs = [[] for _ in range(self.legActions)]
+        # self.joint_qc_logs = [[] for _ in range(self.legActions)]
 
     def get_leg_config(self):
         empty_request = msg_pb2.Empty()
@@ -67,49 +67,48 @@ class LegBase:
                 self.legCommand.position[idx] = qt
             self.set_leg_command()
             tt += dt
-            for idx in range(self.legActions):
-                qt_sample = self.legCommand.position[idx]  # 类似 Mtr->mc
-                qc_sample = self.legState.position[idx]  # 类似 Mtr->aec
-                self.joint_time_logs[idx].append(tt)
-                self.joint_qt_logs[idx].append(qt_sample)
-                self.joint_qc_logs[idx].append(qc_sample)
+            # for idx in range(self.legActions):
+            #     qt_sample = self.legCommand.position[idx]  # 类似 Mtr->mc
+            #     qc_sample = self.legState.position[idx]  # 类似 Mtr->aec
+            #     self.joint_time_logs[idx].append(tt)
+            #     self.joint_qt_logs[idx].append(qt_sample)
+            #     self.joint_qc_logs[idx].append(qc_sample)
 
             timer.waiting(start_time)
 
     def testLeg(self):
-        T = 1.0  # 总时间
+        T = 0.5  # 总时间
         dt0 = np.zeros(self.legActions)
         dt1 = np.zeros(self.legActions)
         dt2 = np.zeros(self.legActions)
         D2R = math.pi / 180.0
                #  pitch    roll    yaw     knee    A_pitch  A_roll       pitch   roll     yaw    knee   A_pitch   A_roll  yaw
-        dt1 = [ -30*D2R,  0*D2R,  0*D2R,  60*D2R, -30*D2R,  0*D2R,     -30*D2R,  0*D2R,  0*D2R,  60*D2R, -30*D2R,  0*D2R,  0]
-        dt2 = [  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,       0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,    0]
+        dt1 = [ -30*D2R,  0*D2R,  0*D2R, 60*D2R,-30*D2R,  0*D2R,       -30*D2R,  0*D2R,  0*D2R, 60*D2R, -30*D2R, 0*D2R,    0]
+        dt2 = [   0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,         0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,    0]
         for i in range(12):
             dt0[i] = dt0[i]
             dt1[i] = dt1[i]
             dt2[i] = dt2[i]
         # 执行关节规划
-        for i in range(1):
+        for i in range(1000):
             gBot.get_leg_state()
-            # print(gBot.legState.position[1],gBot.legState.position[2])
             print("wave round %d" % (i * 2 + 1))
             self.set_leg_path(T, dt1)
-            # print("wave round %d" % (i * 2 + 2))
-            # self.set_leg_path(T, dt2)
-        # print("return to zero")
-        # self.set_leg_path(T, dt0)
-        for idx in range(self.legActions):
-            file_path = f"/home/bot/下载/csvplot/data/joint_{idx}.csv"
-            with open(file_path, mode="w", newline="") as f:
-                writer = csv.writer(f)
-                writer.writerow(["time", "qt", "qc"])
-                for t, mc, aec in zip(
-                        self.joint_time_logs[idx],
-                        self.joint_qt_logs[idx],
-                        self.joint_qc_logs[idx]):
-                    writer.writerow([f"{t:.6f}", f"{mc:.6f}", f"{aec:.6f}"])
-            print(f"关节 {idx} 数据已保存到: {file_path}")
+            print("wave round %d" % (i * 2 + 2))
+            self.set_leg_path(T, dt2)
+        print("return to zero")
+        self.set_leg_path(T, dt0)
+        # for idx in range(self.legActions):
+        #     file_path = f"/home/bot/下载/csvplot/data/joint_{idx}.csv"
+        #     with open(file_path, mode="w", newline="") as f:
+        #         writer = csv.writer(f)
+        #         writer.writerow(["time", "qt", "qc"])
+        #         for t, mc, aec in zip(
+        #                 self.joint_time_logs[idx],
+        #                 self.joint_qt_logs[idx],
+        #                 self.joint_qc_logs[idx]):
+        #             writer.writerow([f"{t:.6f}", f"{mc:.6f}", f"{aec:.6f}"])
+        #     print(f"关节 {idx} 数据已保存到: {file_path}")
 
 # --- 主程序入口 ---
 if __name__ == '__main__':

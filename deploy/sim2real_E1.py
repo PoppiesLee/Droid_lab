@@ -10,6 +10,7 @@ from tools.Gamepad import GamepadHandler
 from tools.CircularBuffer import CircularBuffer
 from tools.load_env_config import load_configuration
 from base.Base import NanoSleep, euler_to_quaternion, quat_rotate_inverse
+from scipy.spatial.transform import Rotation as R
 
 onnx_mode_path = f"policies/policy.onnx"
 
@@ -56,12 +57,17 @@ class Sim2Real(LegBase):
         self.command[0] = get_command(self.command[0], self.rc.state.LEFT_Y   * 0.5, 0.01)
         self.command[1] = get_command(self.command[1], self.rc.state.RIGHT_X  * 0.5, 0.01)
         self.command[2] = get_command(self.command[2], self.rc.state.LEFT_X   * 0.5, 0.01)
-        print(self.command)
         # 遥控器键值变步频处理
         if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
             self.gait_frequency = 0
         else:
             self.gait_frequency = 1.5
+
+    def get_gravity_orientation_from_rpy(self, roll, pitch):
+        rot = R.from_euler('xy', [roll, pitch])
+        g_world = np.array([0, 0, -1])
+        g_local = rot.inv().apply(g_world)
+        return g_local
 
     def get_obs(self, gait_process):
         q = np.array(self.legState.position)
@@ -74,6 +80,7 @@ class Sim2Real(LegBase):
         eq = euler_to_quaternion(base_euler[0], base_euler[1], base_euler[2])
         eq = np.array(eq, dtype=np.double)
         project_gravity = quat_rotate_inverse(eq, np.array([0., 0., -1]))
+        # project_gravity =  self.get_gravity_orientation_from_rpy(base_euler[0], base_euler[1])
         self.update_rc_command()
 
         obs = np.zeros([self.num_observations], dtype=np.float32)
@@ -92,7 +99,7 @@ class Sim2Real(LegBase):
         obs = [np.array(obs, dtype=np.float32)]
         action =np.array(self.onnx_policy.run(None, {"obs": obs})[0].tolist()[0])
         self.action = np.clip(action[Isaac_to_Real_indices], -100.0,100.0)
-        return self.action * self.cfg.action_scale + self.cfg.default_joints
+        return self.action * self.cfg.action_scale  + self.cfg.default_joints
 
     def run(self):
         pre_tic = 0
