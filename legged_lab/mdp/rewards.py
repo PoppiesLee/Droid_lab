@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.sensors import ContactSensor
 import isaaclab.utils.math as math_utils
+from isaaclab.source.isaaclab.isaaclab.envs import ManagerBasedRLEnv
 from isaaclab.utils.math import quat_apply_inverse, yaw_quat
 from isaaclab.assets import Articulation
 
@@ -103,6 +104,27 @@ def lin_vel_z_l2(
 def ang_vel_xy_l2(env: BaseEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     asset: Articulation = env.scene[asset_cfg.name]
     return torch.sum(torch.square(asset.data.root_ang_vel_b[:, :2]), dim=1)
+
+
+def joint_vel_l2(env: BaseEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+    """
+    Penalize joint velocities to reduce oscillation and encourage smoothness.
+    惩罚关节速度，减少震荡并鼓励动作平滑。
+    计算公式: sum(joint_vel^2)
+    """
+    # 1. 获取机器人资产 (Articulation)
+    asset = env.scene[asset_cfg.name]
+
+    # 2. 获取关节速度数据
+    # asset.data.joint_vel shape: (num_envs, num_dofs)
+    # asset_cfg.joint_ids 是根据你在 config 中指定的 joint_names 解析出来的索引
+    # 如果 config 中没写 joint_names，默认就是所有关节
+    velocities = asset.data.joint_vel[:, asset_cfg.joint_ids]
+
+    # 3. 计算平方和 (L2 Norm squared)
+    # 对每个环境的所有关节速度平方求和
+    return torch.sum(torch.square(velocities), dim=1)
+
 
 def energy(env: BaseEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     asset: Articulation = env.scene[asset_cfg.name]
@@ -266,72 +288,6 @@ def feet_too_near_humanoid(env: BaseEnv, asset_cfg: SceneEntityCfg = SceneEntity
     distance = torch.norm(feet_pos[:, 0] - feet_pos[:, 1], dim=-1)
     return (threshold - distance).clamp(min=0)
 
-def feet_height(
-    env: BaseEnv,
-    sensor_cfg: SceneEntityCfg,
-    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
-) -> torch.Tensor:
-    # 分开拿 robot 和 sensor 的 body 索引
-    body_ids_robot = asset_cfg.body_ids
-    body_ids_sensor = sensor_cfg.body_ids
-
-    assert len(body_ids_robot) == 2
-    assert len(body_ids_sensor) == 2
-
-    asset: Articulation = env.scene[asset_cfg.name]
-    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
-
-    in_air = contact_sensor.data.current_contact_time[:, body_ids_sensor] < 0.0
-
-    # ankle_roll_link 的世界位置和姿态（用 robot 的 body_ids）
-    feet_pos = asset.data.body_pos_w[:, body_ids_robot, :]    # (N, 2, 3)
-    feet_quat = asset.data.body_quat_w[:, body_ids_robot, :]  # (N, 2, 4)，假设 (w,x,y,z)
-
-    def quat_apply(q: torch.Tensor, v: torch.Tensor) -> torch.Tensor:
-        q_w = q[..., 0:1]
-        q_xyz = q[..., 1:]
-        t = 2.0 * torch.cross(q_xyz, v, dim=-1)
-        return v + q_w * t + torch.cross(q_xyz, t, dim=-1)
-
-    # -----------------------------
-    # 2. 脚底高度：从“底面某点”改成“脚底几何中心”
-    # -----------------------------
-    # URDF：collision origin (0.02, 0, -0.02)，box 高 0.04
-    #   - 原来用底面 z = -0.04，那只要绕某个边旋转（踮脚尖）也会抬高这个点；
-    #   - 现在改成脚底几何中心：z = -0.02，要求整个脚抬起来才能有明显高度。
-    local_sole_center = torch.tensor(
-        [0.02, 0.0, -0.02],
-        device=feet_pos.device,
-        dtype=feet_pos.dtype,
-    ).view(1, 1, 3).expand_as(feet_pos)
-
-    sole_pos = quat_apply(feet_quat, local_sole_center) + feet_pos
-    foot_height = sole_pos[..., 2]  # (N, 2)
-
-    # -----------------------------
-    # 3. 高度奖励：仍然是高斯型，只加一个“太低不给”的门槛
-    # -----------------------------
-    h_des = 0.06   # 期望脚底离地高度（6cm）
-    sigma = 0.02   # 容忍偏差
-
-    err = (foot_height - h_des) / sigma
-    height_reward = 1.0 - err**2
-    height_reward = torch.clamp(height_reward, min=0.0)  # (N,2) ∈ [0,1]
-
-    # 轻微门槛：脚底高度 < 3cm 就认为没真正抬起来，直接不给这部分高斯奖励
-    #（只是对 height_reward 做 mask，没有新加 reward 项）
-    min_lift = 0.03
-    low_mask = (foot_height > min_lift).float()
-    height_reward = height_reward * low_mask
-
-    # -----------------------------
-    # 4. 和原来一样：空中 × 高度奖励，两条腿求和
-    # -----------------------------
-    reward = (in_air.float() * height_reward).sum(dim=1)
-    return reward
-
-
-
 def feet_swing(env: BaseEnv, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
     left_swing = (torch.abs(env.gait_process - 0.25) < 0.5 * 0.2) & (env.gait_frequency > 1.0e-8)
     right_swing = (torch.abs(env.gait_process - 0.75) < 0.5 * 0.2) & (env.gait_frequency > 1.0e-8)
@@ -383,7 +339,10 @@ def torque_limits(env, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"), soft
     """惩罚扭矩接近限制。"""
     torques = env.scene[asset_cfg.name].data.applied_torque
     torque_limits = env.scene[asset_cfg.name].data.joint_effort_limits
-    over_limit = (torch.abs(torques) - torque_limits * soft_torque_limit).clip(min=0.)
+    # over_limit = (torch.abs(torques) - torque_limits * soft_torque_limit).clip(min=0.)
+    ratio = torch.abs(torques) / (torque_limits + 1e-6)
+    x = (ratio - 0.7).clip(min=0.0)
+    over_limit = x * x
     return torch.sum(over_limit, dim=1)
 
 def dof_vel_limits(env, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"), soft_dof_vel_limit: float = 0.9) -> torch.Tensor:
@@ -392,3 +351,36 @@ def dof_vel_limits(env, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"), sof
     dof_vel_limits = env.scene[asset_cfg.name].data.joint_vel_limits
     over_limit = (torch.abs(dof_vel) - dof_vel_limits * soft_dof_vel_limit).clip(min=0.)
     return torch.sum(over_limit, dim=1)
+
+def joint_torques_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+    """Penalize joint torques applied on the articulation using L2 squared kernel.
+
+    NOTE: Only the joints configured in :attr:`asset_cfg.joint_ids` will have their joint torques contribute to the term.
+    """
+    # extract the used quantities (to enable type-hinting)
+    asset: Articulation = env.scene[asset_cfg.name]
+    return torch.sum(torch.square(asset.data.applied_torque[:, asset_cfg.joint_ids]), dim=1)
+
+def joint_position_penalty(
+    env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, stand_still_scale: float, velocity_threshold: float
+) -> torch.Tensor:
+    """Penalize joint position error from default on the articulation."""
+    # extract the used quantities (to enable type-hinting)
+    asset: Articulation = env.scene[asset_cfg.name]
+    cmd = torch.linalg.norm(env.command_manager.get_command("base_velocity"), dim=1)
+    body_vel = torch.linalg.norm(asset.data.root_lin_vel_b[:, :2], dim=1)
+    reward = torch.linalg.norm((asset.data.joint_pos - asset.data.default_joint_pos), dim=1)
+    return torch.where(torch.logical_or(cmd > 0.0, body_vel > velocity_threshold), reward, stand_still_scale * reward)
+
+def air_time_variance_penalty(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
+    """Penalize variance in the amount of time each foot spends in the air/on the ground relative to each other"""
+    # extract the used quantities (to enable type-hinting)
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    if contact_sensor.cfg.track_air_time is False:
+        raise RuntimeError("Activate ContactSensor's track_air_time!")
+    # compute the reward
+    last_air_time = contact_sensor.data.last_air_time[:, sensor_cfg.body_ids]
+    last_contact_time = contact_sensor.data.last_contact_time[:, sensor_cfg.body_ids]
+    return torch.var(torch.clip(last_air_time, max=0.5), dim=1) + torch.var(
+        torch.clip(last_contact_time, max=0.5), dim=1
+    )

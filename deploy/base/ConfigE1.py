@@ -26,5 +26,5 @@ class Config:
     action_scale = 0.25
 
     # grpc_channel = '192.168.254.100'
-    grpc_channel = '192.168.55.50'
+    grpc_channel = '192.168.51.2'
     effort_limit = np.array([60, 36, 36, 36, 36, 14, 60, 36, 36, 36, 36, 14, 60], dtype=np.float32)  # 峰值扭矩

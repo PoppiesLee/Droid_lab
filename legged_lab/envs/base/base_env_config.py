@@ -6,6 +6,13 @@ from .base_config import BaseSceneCfg, HeightScannerCfg, RobotCfg, RewardCfg, \
     DomainRandCfg, ResetRobotJointsCfg, ResetRobotBaseCfg, RandomizeRobotFrictionCfg, AddRigidBodyMassCfg, \
     PushRobotCfg, ActionDelayCfg, SimCfg, MLPPolicyCfg, RNNPolicyCfg, AlgorithmCfg, PhysxCfg
 
+from isaaclab_rl.rsl_rl import (  # noqa:F401
+    RslRlOnPolicyRunnerCfg,
+    RslRlPpoActorCriticCfg,
+    RslRlPpoAlgorithmCfg,
+    RslRlRndCfg,
+    RslRlSymmetryCfg,
+)
 
 @configclass
 class BaseEnvCfg:
@@ -128,8 +135,8 @@ class BaseEnvCfg:
         ),
     )
     sim: SimCfg = SimCfg(
-        dt=0.005,
-        decimation=2,
+        dt=0.0025,
+        decimation=4,
         physx=PhysxCfg(
             gpu_max_rigid_patch_count=10 * 2**15
         )
@@ -160,7 +167,7 @@ class BaseAgentCfg:
         critic_hidden_dims=[512, 256, 128],
         activation="elu"
     )
-    algorithm: AlgorithmCfg = AlgorithmCfg(
+    algorithm: AlgorithmCfg = RslRlPpoAlgorithmCfg(
         class_name="PPO",
         value_loss_coef=1.0,
         use_clipped_value_loss=True,
@@ -174,6 +181,13 @@ class BaseAgentCfg:
         lam=0.95,
         desired_kl=0.01,
         max_grad_norm=1.0,
+        symmetry_cfg=None,  # RslRlSymmetryCfg()
+        # symmetry_cfg=RslRlSymmetryCfg(
+        #     use_data_augmentation=True,  # 是否把 batch 扩成 [orig; sym]
+        #     use_mirror_loss=True,  # 是否启用镜像 loss
+        #     mirror_loss_coeff=1,  # 镜像 loss 权重
+        #     data_augmentation_func="legged_lab.envs.base.symmetry:get_symmetric_states",
+        # ),
     )
 
     def __post_init__(self):

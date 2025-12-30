@@ -111,7 +111,7 @@ class X3BRewardCfg(RewardCfg):
     joint_deviation_feet = RewTerm(func=mdp.joint_deviation_l1, weight=-0.01,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_ankle_pitch.*"])})
     joint_deviation_ankle = RewTerm(func=mdp.joint_deviation_l1,weight=-0.5,params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_ankle_roll.*"])})
     feet_swings = RewTerm(func=mdp.feet_swing, weight=1.0,params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=[".*_ankle_roll.*"])})
-    feet_height = RewTerm(func=mdp.feet_height, weight=-7.0,params={"asset_cfg": SceneEntityCfg("robot", body_names=[".*ankle_roll.*"]),"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=[".*ankle_roll.*"])})
+    # feet_height = RewTerm(func=mdp.feet_height, weight=-7.0,params={"asset_cfg": SceneEntityCfg("robot", body_names=[".*ankle_roll.*"]),"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=[".*ankle_roll.*"])})
 @configclass
 class X03BFlatEnvCfg(BaseEnvCfg):
     # commands = X3BCommand()

@@ -83,7 +83,7 @@ class LegBase:
         dt2 = np.zeros(self.legActions)
         D2R = math.pi / 180.0
                #  pitch    roll    yaw     knee    A_pitch  A_roll       pitch   roll     yaw    knee   A_pitch   A_roll  yaw
-        dt1 = [ -30*D2R,  0*D2R,  0*D2R, 60*D2R,-30*D2R,  0*D2R,       -30*D2R,  0*D2R,  0*D2R, 60*D2R, -30*D2R, 0*D2R,    0]
+        dt1 = [   0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,         0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  20*D2R]
         dt2 = [   0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,         0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,    0]
         for i in range(12):
             dt0[i] = dt0[i]
