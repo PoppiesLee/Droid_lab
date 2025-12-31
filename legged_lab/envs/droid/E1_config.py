@@ -26,7 +26,7 @@ class E1RewardCfg(RewardCfg):
     dof_acc_l2 = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-7)
     action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-0.01)
     # === 接触与身体稳定 ===
-    undesired_contacts = RewTerm(func=mdp.undesired_contacts, weight=-3.0,params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names="(?!.*ankle.*).*"),"threshold": 1.0})
+    undesired_contacts = RewTerm(func=mdp.undesired_contacts, weight=-1.0,params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names="(?!.*ankle.*).*"),"threshold": 1.0})
     fly = RewTerm(func=mdp.fly, weight=-1.0,params={"sensor_cfg": SceneEntityCfg("contact_sensor", body_names=".*ankle_roll.*"),"threshold": 1.0})
     body_orientation_l2 = RewTerm(func=mdp.body_orientation_l2,params={"asset_cfg": SceneEntityCfg("robot", body_names="torso_link")}, weight=-5.0)
     flat_orientation_l2 = RewTerm(func=mdp.flat_orientation_l2, weight=-2.0)
