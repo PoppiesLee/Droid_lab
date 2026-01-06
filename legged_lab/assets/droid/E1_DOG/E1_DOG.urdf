@@ -13,7 +13,7 @@
   <link name="base">
     <inertial>
       <origin xyz="0.03621322 -0.00022091 -0.00187059" rpy="0 0 0" />
-      <mass value="6" />
+      <mass value="4" />
       <inertia ixx="0.02434924" ixy="0.00004732" ixz="0.00040090" iyy="0.04700770" iyz="-0.00000295" izz="0.05166312" />
     </inertial>
     <visual>

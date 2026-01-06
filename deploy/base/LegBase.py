@@ -6,9 +6,7 @@ from grpc import insecure_channel
 from torch.nn.init import zeros_
 
 from deploy.base.Base import *
-from deploy.base.ConfigE1 import Config
-# from deploy.protos import droid_msg_pb2 as msg_pb2
-# from deploy.protos import leg_service_pb2_grpc as leg_pb2_grpc
+from deploy.base.ConfigE1_DOG import Config
 from droidup.api import droidup_msg_pb2 as msg_pb2
 from droidup.api import leg_service_pb2_grpc as leg_pb2_grpc
 class LegBase:
@@ -83,12 +81,10 @@ class LegBase:
         dt2 = np.zeros(self.legActions)
         D2R = math.pi / 180.0
                #  pitch    roll    yaw     knee    A_pitch  A_roll       pitch   roll     yaw    knee   A_pitch   A_roll  yaw
-        dt1 = [   0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,         0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  20*D2R]
-        dt2 = [   0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,         0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,    0]
-        for i in range(12):
-            dt0[i] = dt0[i]
-            dt1[i] = dt1[i]
-            dt2[i] = dt2[i]
+        # dt1 = [   0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,         0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R]
+        # dt2 = [   0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,         0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,  0*D2R,    0]
+        dt1 = [round(math.radians(d), 4) for d in [0, 0, 0, 0, 0, 0, 0, 0]]
+        dt2 = [round(math.radians(d), 4) for d in [20, 0, 0, -20, 20, 0, 0, -20]]
         # 执行关节规划
         for i in range(1000):
             gBot.get_leg_state()

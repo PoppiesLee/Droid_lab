@@ -273,7 +273,7 @@ E1_CFG = ArticulationCfg(
     init_state=ArticulationCfg.InitialStateCfg(
         pos=(0.0, 0.0, 0.744),
         joint_pos={
-            ".*waist_yaw_joint": 0.0,
+            # ".*waist_yaw_joint": 0.0,
             ".*_hip_pitch_joint": -0.3,
             ".*_hip_roll_joint": 0.0,     # 2 deg
             ".*_hip_yaw_joint": 0.00,    # 12 deg
@@ -285,24 +285,24 @@ E1_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "waist": ImplicitActuatorCfg(
-            joint_names_expr=[".*waist_yaw_joint"],
-            effort_limit_sim={
-                ".*waist_yaw_joint": 60.0
-            },
-            velocity_limit_sim={
-                ".*waist_yaw_joint": 20.42
-            },
-            stiffness={
-                ".*waist_yaw_joint":  100.0
-            },
-            damping={
-                ".*waist_yaw_joint": 5.0
-            },
-            armature={
-                ".*waist_yaw_joint": 0.01
-            },
-        ),
+        # "waist": ImplicitActuatorCfg(
+        #     joint_names_expr=[".*waist_yaw_joint"],
+        #     effort_limit_sim={
+        #         ".*waist_yaw_joint": 60.0
+        #     },
+        #     velocity_limit_sim={
+        #         ".*waist_yaw_joint": 20.42
+        #     },
+        #     stiffness={
+        #         ".*waist_yaw_joint":  100.0
+        #     },
+        #     damping={
+        #         ".*waist_yaw_joint": 5.0
+        #     },
+        #     armature={
+        #         ".*waist_yaw_joint": 0.01
+        #     },
+        # ),
         "legs": ImplicitActuatorCfg(
             joint_names_expr=[".*_hip_pitch_joint", ".*_hip_roll_joint", ".*_hip_yaw_joint", ".*_knee_joint"],
             effort_limit_sim={
@@ -340,7 +340,7 @@ E1_CFG = ArticulationCfg(
             joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
             effort_limit_sim={
                 ".*_ankle_pitch_joint": 60.0,
-                ".*_ankle_roll_joint": 14.0
+                ".*_ankle_roll_joint": 28.0
             },
             velocity_limit_sim={
                 ".*_ankle_pitch_joint": 30.16,
@@ -352,7 +352,7 @@ E1_CFG = ArticulationCfg(
             },
             damping={
                 ".*_ankle_pitch_joint": 2.0,
-                ".*_ankle_roll_joint": 2.0,
+                ".*_ankle_roll_joint": 1.0,
             },
             armature={
                 ".*_ankle_pitch_joint": 0.01,
@@ -416,16 +416,16 @@ E1_DOG_CFG = ArticulationCfg(
                 ".*L_thigh_joint":50.265,
             },
             stiffness={
-                ".*R_hip_joint":25,
-                ".*L_hip_joint":25,
-                ".*R_thigh_joint":25,
-                ".*L_thigh_joint":25,
+                ".*R_hip_joint":50,
+                ".*L_hip_joint":50,
+                ".*R_thigh_joint":50,
+                ".*L_thigh_joint":50,
             },
             damping={
-                ".*R_hip_joint":0.5,
-                ".*L_hip_joint":0.5,
-                ".*R_thigh_joint":0.5,
-                ".*L_thigh_joint":0.5,
+                ".*R_hip_joint":1.0,
+                ".*L_hip_joint":1.0,
+                ".*R_thigh_joint":1.0,
+                ".*L_thigh_joint":1.0,
             },
             armature={
                 ".*R_hip_joint":0.01,
@@ -443,10 +443,10 @@ E1_DOG_CFG = ArticulationCfg(
                 ".*_calf_joint":50.265,
             },
             stiffness={
-                ".*_calf_joint":25,
+                ".*_calf_joint":50,
             },
             damping={
-                ".*_calf_joint":0.5,
+                ".*_calf_joint":1.0,
             },
             armature={
                 ".*_calf_joint":0.01,

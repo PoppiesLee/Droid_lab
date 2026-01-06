@@ -384,3 +384,84 @@ def air_time_variance_penalty(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg
     return torch.var(torch.clip(last_air_time, max=0.5), dim=1) + torch.var(
         torch.clip(last_contact_time, max=0.5), dim=1
     )
+
+def reward_track_trot_gait(env, sensor_cfg: SceneEntityCfg):
+    """
+    奖励机器人跟随 Trot 步态时钟。
+    注意：由于 Fixed Joint Merging，PhysX 把 foot 融合进了 calf_link。
+    所以这里检测的是 calf_link 的受力，实际上就是脚底受力。
+    """
+    # 1. 获取接触力数据
+    # 这里必须指向 calf_link，因为 foot_link 被合并了
+    contact_sensor = env.scene.sensors[sensor_cfg.name]
+    force_norm = torch.norm(contact_sensor.data.net_forces_w_history[:, 0, sensor_cfg.body_ids], dim=-1)
+    is_contact = force_norm > 1.0
+
+    # 2. 获取步态时钟
+    phase = env.gait_process
+    sin_phase = torch.sin(2 * torch.pi * phase)
+
+    # 3. 定义期望接触状态
+    desired_contact = torch.zeros_like(is_contact, dtype=torch.float)
+
+    # 逻辑：
+    # sin > 0: 期望 FL(0) + RR(3) 触地
+    # sin < 0: 期望 FR(1) + RL(2) 触地
+
+    mask_group1 = (sin_phase > 0)
+    mask_group2 = (sin_phase <= 0)
+
+    # Group 1: FL(0) + RR(3)
+    desired_contact[mask_group1, 0] = 1.0
+    desired_contact[mask_group1, 3] = 1.0
+
+    # Group 2: FR(1) + RL(2)
+    desired_contact[mask_group2, 1] = 1.0
+    desired_contact[mask_group2, 2] = 1.0
+
+    # 4. 计算奖励
+    match = (is_contact.float() == desired_contact).float()
+    return torch.mean(match, dim=1)
+
+def reward_track_biped_walk_gait(env, sensor_cfg: SceneEntityCfg):
+    """
+    奖励双足机器人跟随行走步态时钟 (Walk Gait)：
+    - 假设双足机器人的脚部顺序为 [Left, Right] (索引 0, 1)
+    - 时钟前半段 (sin > 0): 期望 左脚(L) 触地，右脚(R) 腾空
+    - 时钟后半段 (sin < 0): 期望 右脚(R) 触地，左脚(L) 腾空
+    """
+    # 1. 获取接触力数据
+    # 注意：sensor_cfg.body_names 必须只匹配到 2 个刚体 (左脚, 右脚)
+    contact_sensor = env.scene.sensors[sensor_cfg.name]
+
+    # 获取脚部受力 (num_envs, 2)
+    force_norm = torch.norm(contact_sensor.data.net_forces_w_history[:, 0, sensor_cfg.body_ids], dim=-1)
+    is_contact = force_norm > 1.0  # 判定触地阈值
+
+    # 2. 获取步态时钟
+    phase = env.gait_process
+    sin_phase = torch.sin(2 * torch.pi * phase)
+
+    # 3. 定义期望接触状态
+    desired_contact = torch.zeros_like(is_contact, dtype=torch.float)
+
+    # 假设 sensor_cfg 匹配到的顺序是 [Left_Foot, Right_Foot]
+    # Left_Foot 索引 = 0
+    # Right_Foot 索引 = 1
+
+    # === 相位 A: 左腿支撑 (Left Stance) ===
+    # sin_phase > 0 时，期望 Left(0) 触地，Right(1) 腾空
+    mask_left_stance = (sin_phase > 0)
+    desired_contact[mask_left_stance, 0] = 1.0
+    desired_contact[mask_left_stance, 1] = 0.0  # 显式写出，方便理解
+
+    # === 相位 B: 右腿支撑 (Right Stance) ===
+    # sin_phase <= 0 时，期望 Right(1) 触地，Left(0) 腾空
+    mask_right_stance = (sin_phase <= 0)
+    desired_contact[mask_right_stance, 1] = 1.0
+    desired_contact[mask_right_stance, 0] = 0.0
+
+    # 4. 计算奖励
+    # 只有当实际状态完全匹配期望状态时，match 才为 1
+    match = (is_contact.float() == desired_contact).float()
+    return torch.mean(match, dim=1)

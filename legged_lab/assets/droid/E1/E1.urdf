@@ -4,7 +4,7 @@
     <compiler meshdir="./meshes" balanceinertia="true" discardvisual="false" />
   </mujoco>
   
-<!--   <link name="world"></link>-->
+<!--  <link name="world"></link>-->
 <!--  <joint name="floating_base_joint" type="floating">-->
 <!--    <parent link="world"/>-->
 <!--    <child link="pelvis"/>-->
@@ -575,7 +575,7 @@
     <child link="torso_link" />
     <axis xyz="0 0 0" />
   </joint> -->
-  <joint name="waist_yaw_joint" type="revolute">
+  <joint name="waist_yaw_joint" type="fixed">
     <origin xyz="0 0 0.111" rpy="0 0 0" />
     <parent link="pelvis" />
     <child link="torso_link" />

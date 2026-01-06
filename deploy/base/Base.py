@@ -117,7 +117,7 @@ def set_motor_mode(command, config):
 
 
 def set_joint_mode(command, config, num_actions):
-    command.cmd_enable = 2
+    # command.cmd_enable = 2
     for idx in range(num_actions):
         command.kp[idx] = config.dof_stiffness[idx]
         command.kd[idx] = config.dof_damping[idx]

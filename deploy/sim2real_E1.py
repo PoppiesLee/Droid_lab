@@ -14,8 +14,8 @@ from scipy.spatial.transform import Rotation as R
 
 onnx_mode_path = f"policies/policy.onnx"
 
-IsaacLabJointOrder = ['left_hip_pitch_joint', 'right_hip_pitch_joint', 'waist_yaw_joint', 'left_hip_roll_joint', 'right_hip_roll_joint', 'left_hip_yaw_joint', 'right_hip_yaw_joint', 'left_knee_joint', 'right_knee_joint', 'left_ankle_pitch_joint', 'right_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_ankle_roll_joint']
-RealJointOrder = ['left_hip_pitch_joint', 'left_hip_roll_joint', 'left_hip_yaw_joint', 'left_knee_joint', 'left_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_hip_pitch_joint', 'right_hip_roll_joint', 'right_hip_yaw_joint', 'right_knee_joint', 'right_ankle_pitch_joint', 'right_ankle_roll_joint', 'waist_yaw_joint']
+IsaacLabJointOrder = ['left_hip_pitch_joint', 'right_hip_pitch_joint', 'left_hip_roll_joint', 'right_hip_roll_joint', 'left_hip_yaw_joint', 'right_hip_yaw_joint', 'left_knee_joint', 'right_knee_joint', 'left_ankle_pitch_joint', 'right_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_ankle_roll_joint']
+RealJointOrder = ['left_hip_pitch_joint', 'left_hip_roll_joint', 'left_hip_yaw_joint', 'left_knee_joint', 'left_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_hip_pitch_joint', 'right_hip_roll_joint', 'right_hip_yaw_joint', 'right_knee_joint', 'right_ankle_pitch_joint', 'right_ankle_roll_joint']
 # 找到 IsaacLabJointOrder 中每个关节在 MujocoJointOrder 中的索引-30*D2R,  0*D2R,  0*D2R,  60*D2R, -30*D2R,  0*D2R
 # Mujoco_to_Isaac_indices = [MujocoJointOrder.index(joint) for joint in IsaacLabJointOrder]
 Isaac_to_Real_indices = [IsaacLabJointOrder.index(joint) for joint in RealJointOrder]
@@ -26,8 +26,8 @@ Real_to_Isaac_indices = [RealJointOrder.index(joint) for joint in IsaacLabJointO
 class Sim2Real(LegBase):
     def __init__(self):
         LegBase.__init__(self)
-        self.num_actions = 13
-        self.num_observations = 50
+        self.num_actions = 12
+        self.num_observations = 47
         self.gait_frequency = 0
         self.cfg = load_configuration("policies/env_cfg.json", RealJointOrder)
         self.run_flag = True
@@ -70,8 +70,8 @@ class Sim2Real(LegBase):
         return g_local
 
     def get_obs(self, gait_process):
-        q = np.array(self.legState.position)
-        dq = np.array(self.legState.velocity)
+        q = np.array(self.legState.position[:12])
+        dq = np.array(self.legState.velocity[:12])
 
         base_euler = np.array(self.legState.imu_euler)
         base_ang_vel = np.array(self.legState.imu_gyro)
@@ -90,9 +90,9 @@ class Sim2Real(LegBase):
         obs[6:9] = self.command
         obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
         obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
-        obs[11: 24] = (q- self.cfg.default_joints)[Real_to_Isaac_indices]
-        obs[24: 37] = dq[Real_to_Isaac_indices]
-        obs[37: 50] = self.action[Real_to_Isaac_indices]
+        obs[11: 23] = (q- self.cfg.default_joints)[Real_to_Isaac_indices]
+        obs[23: 35] = dq[Real_to_Isaac_indices]
+        obs[35: 47] = self.action[Real_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
         return q, dq, obs
 
@@ -120,6 +120,7 @@ class Sim2Real(LegBase):
             q, dq, obs = self.get_obs(gait_process)
             self.hist_obs.append(obs)
             self.target_q = self.get_action(self.hist_obs.get())
+            self.target_q = np.append(self.target_q, 0)
             for idx in range(self.legActions):
                 self.legCommand.position[idx] = self.target_q[idx]
             self.set_leg_command()

@@ -4,6 +4,7 @@ import numpy as np
 from tqdm import tqdm
 import onnxruntime as ort
 from base.LegBase import LegBase
+from base.ArmBase import ArmBase
 from base.Base import get_command
 from base.Base import set_joint_mode
 from tools.Gamepad import GamepadHandler
@@ -14,8 +15,8 @@ from scipy.spatial.transform import Rotation as R
 
 onnx_mode_path = f"policies/policy.onnx"
 
-IsaacLabJointOrder = ['left_hip_pitch_joint', 'right_hip_pitch_joint', 'waist_yaw_joint', 'left_hip_roll_joint', 'right_hip_roll_joint', 'left_hip_yaw_joint', 'right_hip_yaw_joint', 'left_knee_joint', 'right_knee_joint', 'left_ankle_pitch_joint', 'right_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_ankle_roll_joint']
-RealJointOrder = ['left_hip_pitch_joint', 'left_hip_roll_joint', 'left_hip_yaw_joint', 'left_knee_joint', 'left_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_hip_pitch_joint', 'right_hip_roll_joint', 'right_hip_yaw_joint', 'right_knee_joint', 'right_ankle_pitch_joint', 'right_ankle_roll_joint', 'waist_yaw_joint']
+IsaacLabJointOrder = ['FL_thigh_joint', 'FR_thigh_joint', 'RL_thigh_joint', 'RR_thigh_joint', 'FL_hip_joint', 'FR_hip_joint', 'RL_hip_joint', 'RR_hip_joint', 'FL_calf_joint', 'FR_calf_joint', 'RL_calf_joint', 'RR_calf_joint']
+RealJointOrder     = ['FL_thigh_joint', 'FL_hip_joint', 'FL_calf_joint', 'FR_thigh_joint', 'FR_hip_joint', 'FR_calf_joint', 'RL_thigh_joint', 'RL_hip_joint', 'RL_calf_joint', 'RR_thigh_joint','RR_hip_joint', 'RR_calf_joint']
 # 找到 IsaacLabJointOrder 中每个关节在 MujocoJointOrder 中的索引-30*D2R,  0*D2R,  0*D2R,  60*D2R, -30*D2R,  0*D2R
 # Mujoco_to_Isaac_indices = [MujocoJointOrder.index(joint) for joint in IsaacLabJointOrder]
 Isaac_to_Real_indices = [IsaacLabJointOrder.index(joint) for joint in RealJointOrder]
@@ -23,11 +24,12 @@ Isaac_to_Real_indices = [IsaacLabJointOrder.index(joint) for joint in RealJointO
 # Isaac_to_Mujoco_indices = [IsaacLabJointOrder.index(joint) for joint in MujocoJointOrder]
 Real_to_Isaac_indices = [RealJointOrder.index(joint) for joint in IsaacLabJointOrder]
 
-class Sim2Real(LegBase):
+class Sim2Real(ArmBase, LegBase):
     def __init__(self):
+        ArmBase.__init__(self)
         LegBase.__init__(self)
-        self.num_actions = 13
-        self.num_observations = 50
+        self.num_actions = 12
+        self.num_observations = 47
         self.gait_frequency = 0
         self.cfg = load_configuration("policies/env_cfg.json", RealJointOrder)
         self.run_flag = True
@@ -37,12 +39,17 @@ class Sim2Real(LegBase):
         self.action = np.zeros(self.num_actions, dtype=np.double)
         self.onnx_policy = ort.InferenceSession(onnx_mode_path)
         self.hist_obs = CircularBuffer(self.num_observations, self.cfg.hist_length)
+        set_joint_mode(self.armCommand, self.cfg, self.armActions)
         set_joint_mode(self.legCommand, self.cfg, self.legActions)
         self.rc = GamepadHandler()
 
     def init_robot(self):
         print("default_joints: ", self.cfg.default_joints)
-        self.set_leg_path(1, self.cfg.default_joints[:self.legActions])
+        arm_init_pos = np.concatenate((self.cfg.default_joints[0:2], [0.0], self.cfg.default_joints[2:5],[0.0], [self.cfg.default_joints[5]]))
+        print("arm_init_pos: ", (arm_init_pos))
+        leg_init_pos = np.concatenate((self.cfg.default_joints[6:8], [0.0], self.cfg.default_joints[8:11],[0.0], [self.cfg.default_joints[11]]))
+        self.set_arm_path(1, arm_init_pos)
+        self.set_leg_path(1, leg_init_pos)
         timer = NanoSleep(self.cfg.decimation)  # 创建一个decimation毫秒的NanoSleep对象
         print("单击三开始, LT按压到底到底急停")
         while (self.rc.state.START == False) and (self.run_flag == True):  # CH6
@@ -70,8 +77,8 @@ class Sim2Real(LegBase):
         return g_local
 
     def get_obs(self, gait_process):
-        q = np.array(self.legState.position)
-        dq = np.array(self.legState.velocity)
+        q = np.concatenate((self.armState.position[0:2], [self.armState.position[3]], self.armState.position[4:6], [self.armState.position[7]], self.legState.position[0:2], [self.legState.position[3]], self.legState.position[4:6], [self.legState.position[7]]))
+        dq = np.concatenate((self.armState.velocity[0:2], [self.armState.velocity[3]], self.armState.velocity[4:6], [self.armState.velocity[7]], self.legState.velocity[0:2], [self.legState.velocity[3]], self.legState.velocity[4:6], [self.legState.velocity[7]]))
 
         base_euler = np.array(self.legState.imu_euler)
         base_ang_vel = np.array(self.legState.imu_gyro)
@@ -90,9 +97,9 @@ class Sim2Real(LegBase):
         obs[6:9] = self.command
         obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
         obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
-        obs[11: 24] = (q- self.cfg.default_joints)[Real_to_Isaac_indices]
-        obs[24: 37] = dq[Real_to_Isaac_indices]
-        obs[37: 50] = self.action[Real_to_Isaac_indices]
+        obs[11: 23] = (q- self.cfg.default_joints)[Real_to_Isaac_indices]
+        obs[23: 35] = dq[Real_to_Isaac_indices]
+        obs[35: 47] = self.action[Real_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
         return q, dq, obs
 
@@ -120,8 +127,31 @@ class Sim2Real(LegBase):
             q, dq, obs = self.get_obs(gait_process)
             self.hist_obs.append(obs)
             self.target_q = self.get_action(self.hist_obs.get())
+            for idx in range(self.armActions):
+                if idx <= 1:
+                    self.armCommand.position[idx] = self.target_q[idx]
+                elif idx == 2:
+                    self.armCommand.position[idx] = 0.0
+                elif idx > 2 and idx <= 5:
+                    self.armCommand.position[idx] = self.target_q[idx-1]
+                elif idx == 6:
+                    self.armCommand.position[idx] = 0.0
+                else:
+                    self.armCommand.position[idx] = self.target_q[idx-2]
+
             for idx in range(self.legActions):
-                self.legCommand.position[idx] = self.target_q[idx]
+                if idx <= 1:
+                    self.legCommand.position[idx] = self.target_q[idx+6]
+                elif idx == 2:
+                    self.legCommand.position[idx] = 0.0
+                elif idx > 2 and idx <= 5:
+                    self.legCommand.position[idx] = self.target_q[idx+6-1]
+                elif idx == 6:
+                    self.legCommand.position[idx] = 0.0
+                else:
+                    self.legCommand.position[idx] = self.target_q[idx+6-2]
+
+            self.set_arm_command()
             self.set_leg_command()
             pbar.set_postfix(
                 realCycle=f"{self.legState.system_tic - pre_tic}ms",  # 实际循环周期，单位毫秒

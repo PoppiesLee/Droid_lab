@@ -186,7 +186,7 @@ class BaseAgentCfg:
         #     use_data_augmentation=True,  # 是否把 batch 扩成 [orig; sym]
         #     use_mirror_loss=True,  # 是否启用镜像 loss
         #     mirror_loss_coeff=1,  # 镜像 loss 权重
-        #     data_augmentation_func="legged_lab.envs.base.symmetry:get_symmetric_states",
+        #     data_augmentation_func="legged_lab.envs.base.symmetry-12:get_symmetric_states",
         # ),
     )
 

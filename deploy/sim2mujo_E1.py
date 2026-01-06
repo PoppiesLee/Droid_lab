@@ -21,8 +21,8 @@ MAX_LINE_VEL  = 2.0
 MAX_ANGLE_VEL = 0.5
 
 #                           0            1            2              3               4                5               6            7            8              9
-IsaacLabJointOrder = ['left_hip_pitch_joint', 'right_hip_pitch_joint', 'waist_yaw_joint', 'left_hip_roll_joint', 'right_hip_roll_joint', 'left_hip_yaw_joint', 'right_hip_yaw_joint', 'left_knee_joint', 'right_knee_joint', 'left_ankle_pitch_joint', 'right_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_ankle_roll_joint']
-MujocoJointOrder = ['left_hip_pitch_joint', 'left_hip_roll_joint', 'left_hip_yaw_joint', 'left_knee_joint', 'left_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_hip_pitch_joint', 'right_hip_roll_joint', 'right_hip_yaw_joint', 'right_knee_joint', 'right_ankle_pitch_joint', 'right_ankle_roll_joint','waist_yaw_joint']
+IsaacLabJointOrder = ['left_hip_pitch_joint', 'right_hip_pitch_joint', 'left_hip_roll_joint', 'right_hip_roll_joint', 'left_hip_yaw_joint', 'right_hip_yaw_joint', 'left_knee_joint', 'right_knee_joint', 'left_ankle_pitch_joint', 'right_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_ankle_roll_joint']
+MujocoJointOrder = ['left_hip_pitch_joint', 'left_hip_roll_joint', 'left_hip_yaw_joint', 'left_knee_joint', 'left_ankle_pitch_joint', 'left_ankle_roll_joint', 'right_hip_pitch_joint', 'right_hip_roll_joint', 'right_hip_yaw_joint', 'right_knee_joint', 'right_ankle_pitch_joint', 'right_ankle_roll_joint']
 # 找到 IsaacLabJointOrder 中每个关节在 MujocoJointOrder 中的索引
 Mujoco_to_Isaac_indices = [MujocoJointOrder.index(joint) for joint in IsaacLabJointOrder]
 # 找到 MujocoJointOrder 中每个关节在 IsaacLabJointOrder 中的索引
@@ -64,8 +64,8 @@ def get_command(last_value, current_value, max_increment):
 class Sim2Mujo:
     def __init__(self):
         self.gait_frequency = 0
-        self.num_actions = 13
-        self.num_observations = 50
+        self.num_actions = 12
+        self.num_observations = 47
         self.aoa_reader = AoaReader()
         self.aoa_reader.start_server()
         # joint target
@@ -176,9 +176,9 @@ class Sim2Mujo:
         obs[6:9] = command
         obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
         obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
-        obs[11: 24] = (q - self.cfg.default_joints)[Mujoco_to_Isaac_indices]
-        obs[24: 37] = dq[Mujoco_to_Isaac_indices]
-        obs[37: 50] = self.action[Mujoco_to_Isaac_indices]
+        obs[11: 23] = (q - self.cfg.default_joints)[Mujoco_to_Isaac_indices]
+        obs[23: 35] = dq[Mujoco_to_Isaac_indices]
+        obs[35: 47] = self.action[Mujoco_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
         return q, dq, obs
 

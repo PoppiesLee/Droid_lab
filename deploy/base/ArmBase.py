@@ -1,36 +1,31 @@
 import math
 from Base import *
 from grpc import insecure_channel
-from deploy.base.Config import Config
-from deploy.protos import droid_msg_pb2 as msg_pb2
-from deploy.protos import arm_service_pb2_grpc as arm_pb2_grpc
-
+from deploy.base.ConfigE1_DOG import Config
+from droidup.api import droidup_msg_pb2 as msg_pb2
+from droidup.api import arm_service_pb2_grpc as arm_pb2_grpc
 
 class ArmBase:
     def __init__(self):
         print("Initializing ArmBase")
         self.ArmEnvCfg = Config
         self.armActions = self.ArmEnvCfg.num_arm_actions
-        # grpc defines
         self.armConfigs = msg_pb2.DroidConfigs()
         self.armState = msg_pb2.DroidArmResponse()
         self.armCommand = msg_pb2.DroidCommandRequest()
         channel = insecure_channel(self.ArmEnvCfg.grpc_channel + ":50052")
         print("Successfully connected to： ", self.ArmEnvCfg.grpc_channel + ":50052")
         self.armStub = arm_pb2_grpc.ArmServiceStub(channel)
-        init_command(self.armCommand, self.ArmEnvCfg.num_arm_actions)
-        for idx in range(12):
-            self.armCommand.finger.append(10)
+        init_command(self.armCommand, self.armActions)
         # 建立通信，获取机器人底层信息
         self.get_arm_config()
         self.get_arm_state()
-        # 电机空间控制或关节空间控制
-        set_motor_mode(self.armCommand, self.armConfigs)
-        # self.set_joint_mode(self.armCommand)
+        set_joint_mode(self.armCommand, self.ArmEnvCfg, self.armActions)
 
     def get_arm_config(self):
         empty_request = msg_pb2.Empty()
         self.armConfigs = self.armStub.GetArmConfig(empty_request)
+        print_configs(self.armConfigs)
 
     def get_arm_state(self):
         empty_request = msg_pb2.Empty()
@@ -70,8 +65,8 @@ class ArmBase:
         dt1 = np.zeros(self.armActions)
         dt2 = np.zeros(self.armActions)
         if self.armActions == 8:
-            dt0 = [round(math.radians(d), 4) for d in [-30, 10, 0,  80, -30, 10, 0,  80]]
-            dt1 = [round(math.radians(d), 4) for d in [-30, 10, 0, 100,  30, 10, 0, 100]]
+            dt0 = [round(math.radians(d), 4) for d in [ 0,  0,  0,   0,   0,  0, 0,   0]]
+            dt1 = [round(math.radians(d), 4) for d in [20,  0,  0, -20,  20,  0, 0, -20]]
             dt2 = [round(math.radians(d), 4) for d in [30,  10, 0, 100, -30, 10, 0, 100]]
         if self.armActions == 10:
             dt0 = [round(math.radians(d), 4) for d in [-30, 10, 0,  80, -100, -30, 10, 0,  80, -100]]
@@ -80,15 +75,15 @@ class ArmBase:
         # 执行关节规划
         for i in range(2):
             print("wave round %d" % (i * 2 + 1))
-            if self.ArmEnvCfg.hands_enable:
-                for idx in range(12):
-                    self.armCommand.finger[idx] = 50
+            # if self.ArmEnvCfg.hands_enable:
+            #     for idx in range(12):
+            #         self.armCommand.finger[idx] = 50
             self.set_arm_path(T, dt1)
-            print("wave round %d" % (i * 2 + 2))
-            if self.ArmEnvCfg.hands_enable:
-                for idx in range(12):
-                    self.armCommand.finger[idx] = 5
-            self.set_arm_path(T, dt2)
+            # print("wave round %d" % (i * 2 + 2))
+            # if self.ArmEnvCfg.hands_enable:
+            #     for idx in range(12):
+            #         self.armCommand.finger[idx] = 5
+            # self.set_arm_path(T, dt2)
         print("return to zero")
         gBot.set_arm_path(T, dt0)
 

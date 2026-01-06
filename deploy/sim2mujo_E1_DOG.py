@@ -269,7 +269,7 @@ class Sim2Mujo:
 
 if __name__ == '__main__':
     mybot = Sim2Mujo()
-    mybot.init_robot()
+    # mybot.init_robot()
     print("start main run")
     try:
         while True:
