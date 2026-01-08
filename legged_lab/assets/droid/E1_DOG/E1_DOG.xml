@@ -33,7 +33,7 @@
       <geom pos="0.24 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.41961 0.41961 0.41961 1" mesh="head_pitch_link"/>
       <geom pos="0.25 0 0.12" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.41961 0.41961 0.41961 1" mesh="head_yaw_link"/>
       <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="1 1 1 1" mesh="logo"/>
-      <site name="imu" pos="0 0  0.03"/>
+      <site name="imu" pos="-0.10 0  0.07"/>
       <body name="FL_thigh_link" pos="0.1755 0.094 0">
         <inertial pos="0 0.0468537 0" quat="0.707107 0.707107 0 0" mass="0.8" diaginertia="0.0009615 0.00072642 0.00052077"/>
         <joint name="FL_thigh_joint" pos="0 0 0" axis="0 1 0" range="-1.5708 3.4907" actuatorfrcrange="-23.7 23.7"/>

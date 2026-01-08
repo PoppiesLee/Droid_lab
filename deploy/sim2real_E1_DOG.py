@@ -46,7 +46,6 @@ class Sim2Real(ArmBase, LegBase):
     def init_robot(self):
         print("default_joints: ", self.cfg.default_joints)
         arm_init_pos = np.concatenate((self.cfg.default_joints[0:2], [0.0], self.cfg.default_joints[2:5],[0.0], [self.cfg.default_joints[5]]))
-        print("arm_init_pos: ", (arm_init_pos))
         leg_init_pos = np.concatenate((self.cfg.default_joints[6:8], [0.0], self.cfg.default_joints[8:11],[0.0], [self.cfg.default_joints[11]]))
         self.set_arm_path(1, arm_init_pos)
         self.set_leg_path(1, leg_init_pos)

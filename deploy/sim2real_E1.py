@@ -37,12 +37,13 @@ class Sim2Real(LegBase):
         self.action = np.zeros(self.num_actions, dtype=np.double)
         self.onnx_policy = ort.InferenceSession(onnx_mode_path)
         self.hist_obs = CircularBuffer(self.num_observations, self.cfg.hist_length)
-        set_joint_mode(self.legCommand, self.cfg, self.legActions)
+        # set_joint_mode(self.legCommand, self.cfg, self.legActions)
         self.rc = GamepadHandler()
 
     def init_robot(self):
         print("default_joints: ", self.cfg.default_joints)
-        self.set_leg_path(1, self.cfg.default_joints[:self.legActions])
+        init_pos = np.append(self.cfg.default_joints, 0.0)
+        self.set_leg_path(1, init_pos)
         timer = NanoSleep(self.cfg.decimation)  # 创建一个decimation毫秒的NanoSleep对象
         print("单击三开始, LT按压到底到底急停")
         while (self.rc.state.START == False) and (self.run_flag == True):  # CH6
@@ -120,7 +121,8 @@ class Sim2Real(LegBase):
             q, dq, obs = self.get_obs(gait_process)
             self.hist_obs.append(obs)
             self.target_q = self.get_action(self.hist_obs.get())
-            self.target_q = np.append(self.target_q, 0)
+            self.target_q = np.append(self.target_q, 0.0)
+            print(self.target_q)
             for idx in range(self.legActions):
                 self.legCommand.position[idx] = self.target_q[idx]
             self.set_leg_command()
