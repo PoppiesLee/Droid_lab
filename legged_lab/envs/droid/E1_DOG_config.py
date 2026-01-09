@@ -38,7 +38,7 @@ class E1_DOGRewardCfg(RewardCfg):
     joint_torques = RewTerm(func=mdp.joint_torques_l2, weight=-2e-4)
     action_rate = RewTerm(func=mdp.action_rate_l2, weight=-0.1)
     dof_pos_limits = RewTerm(func=mdp.joint_pos_limits, weight=-5.0)
-    energy = RewTerm(func=mdp.energy, weight=-2e-5)
+    energy = RewTerm(func=mdp.energy, weight=-1e-3)
 
     # -- Robot Body Penalties --
     flat_orientation_l2 = RewTerm(func=mdp.flat_orientation_l2, weight=-2.5)

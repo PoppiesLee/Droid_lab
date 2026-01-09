@@ -322,7 +322,7 @@
   </joint>
   <link name="RL_thigh_link">
     <inertial>
-      <origin xyz="0.00049999 0.04585371 0" rpy="0 0 0" />
+      <origin xyz="0  0.04585371 0" rpy="0 0 0" />
       <mass value="0.8" />
       <inertia ixx="0.00096150" ixy="0" ixz="0" iyy="0.00052077" iyz="0" izz="0.00072642" />
     </inertial>
@@ -343,7 +343,7 @@
     </collision> -->
   </link>
   <joint name="RL_thigh_joint" type="revolute">
-    <origin xyz="-0.175 0.095 0" rpy="0 0 0" />
+    <origin xyz="-0.175 0.094 0" rpy="0 0 0" />
     <parent link="base" />
     <child link="RL_thigh_link" />
     <axis xyz="0 1 0" />

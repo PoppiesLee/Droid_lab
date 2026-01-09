@@ -169,7 +169,7 @@ class Sim2Mujo:
             self.gait_frequency = 0
         else:
             max_abs_command = max(abs(self.command[0]), abs(self.command[1]), abs(self.command[2]))
-            self.gait_frequency = 1.5
+            self.gait_frequency = 3.0
         obs = np.zeros(self.num_observations, dtype=np.float32)
         obs[0:3] = ang_vel
         obs[3:6] = proj_grav

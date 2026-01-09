@@ -416,16 +416,16 @@ E1_DOG_CFG = ArticulationCfg(
                 ".*L_thigh_joint":50.265,
             },
             stiffness={
-                ".*R_hip_joint":50,
-                ".*L_hip_joint":50,
-                ".*R_thigh_joint":50,
-                ".*L_thigh_joint":50,
+                ".*R_hip_joint":100,
+                ".*L_hip_joint":100,
+                ".*R_thigh_joint":100,
+                ".*L_thigh_joint":100,
             },
             damping={
-                ".*R_hip_joint":1.0,
-                ".*L_hip_joint":1.0,
-                ".*R_thigh_joint":1.0,
-                ".*L_thigh_joint":1.0,
+                ".*R_hip_joint":3.0,
+                ".*L_hip_joint":3.0,
+                ".*R_thigh_joint":3.0,
+                ".*L_thigh_joint":3.0,
             },
             armature={
                 ".*R_hip_joint":0.01,
@@ -443,10 +443,10 @@ E1_DOG_CFG = ArticulationCfg(
                 ".*_calf_joint":50.265,
             },
             stiffness={
-                ".*_calf_joint":50,
+                ".*_calf_joint":100,
             },
             damping={
-                ".*_calf_joint":1.0,
+                ".*_calf_joint":3.0,
             },
             armature={
                 ".*_calf_joint":0.01,

@@ -17,9 +17,11 @@ class Config:
     default_joints = np.array([0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0], dtype=np.float32)
     # default_joints = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float32)
 
-    dof_stiffness = np.array([25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0], dtype=np.float32)
+    dof_stiffness = np.array([50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0,
+                              50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0], dtype=np.float32)
     dof_stiffness*=1.0
-    dof_damping   = np.array([0.5,  0.5, 0.5,  0.5, 0.5,  0.5, 0.5,  0.5, 0.5,  0.5, 0.5,  0.5, 0.5,  0.5, 0.5,  0.5], dtype=np.float32)
+    dof_damping   = np.array([1.0,  1.0, 1.0,  1.0, 1.0,  1.0, 1.0,  1.0,
+                              1.0,  1.0, 1.0,  1.0, 1.0,  1.0, 1.0,  1.0], dtype=np.float32)
     # dof_damping = np.array([10.000, 10.000,  5.00, 5.00, 5.000, 5.000, 5.00, 10.0000, 10.0000, 5.000, 5.000, 5.000, 5.000, 5.000], dtype=np.float32)
     run_duration = 100.0  # 单位s
     gait_frequency = 1.5  # sec

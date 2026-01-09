@@ -465,3 +465,19 @@ def reward_track_biped_walk_gait(env, sensor_cfg: SceneEntityCfg):
     # 只有当实际状态完全匹配期望状态时，match 才为 1
     match = (is_contact.float() == desired_contact).float()
     return torch.mean(match, dim=1)
+
+
+def feet_air_time_variance_penalty(env: BaseEnv, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
+    """
+    惩罚四条腿腾空时间的方差。
+    如果迈步不一样大（导致腾空时间不一致），此项会产生惩罚。
+    """
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    # 获取最近一次完整的腾空时间 (last_air_time) 而不是当前的
+    last_air_time = contact_sensor.data.last_air_time[:, sensor_cfg.body_ids]
+
+    # 计算四条腿腾空时间的方差 (Variance)
+    # 方差越小，说明四条腿迈步越一致
+    var = torch.var(last_air_time, dim=1)
+
+    return var

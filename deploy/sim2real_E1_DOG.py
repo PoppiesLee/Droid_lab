@@ -39,8 +39,8 @@ class Sim2Real(ArmBase, LegBase):
         self.action = np.zeros(self.num_actions, dtype=np.double)
         self.onnx_policy = ort.InferenceSession(onnx_mode_path)
         self.hist_obs = CircularBuffer(self.num_observations, self.cfg.hist_length)
-        set_joint_mode(self.armCommand, self.cfg, self.armActions)
-        set_joint_mode(self.legCommand, self.cfg, self.legActions)
+        # set_joint_mode(self.armCommand, self.cfg, self.armActions)
+        # set_joint_mode(self.legCommand, self.cfg, self.legActions)
         self.rc = GamepadHandler()
 
     def init_robot(self):
@@ -67,7 +67,7 @@ class Sim2Real(ArmBase, LegBase):
         if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
             self.gait_frequency = 0
         else:
-            self.gait_frequency = 1.5
+            self.gait_frequency = 2.5
 
     def get_gravity_orientation_from_rpy(self, roll, pitch):
         rot = R.from_euler('xy', [roll, pitch])
