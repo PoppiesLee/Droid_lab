@@ -8,7 +8,7 @@ from pynput import keyboard
 from tqdm import tqdm
 import onnxruntime as ort
 from tools.aoa_ctrl import AoaReader
-from tools.load_env_config import load_configuration
+from tools.load_env_config_DOG import load_configuration
 from deploy.tools.CircularBuffer import CircularBuffer
 from tools.data_var import Q, data_dict, QKey_list
 from datetime import datetime
@@ -65,7 +65,7 @@ class Sim2Mujo:
     def __init__(self):
         self.gait_frequency = 0
         self.num_actions = 12
-        self.num_observations = 47
+        self.num_observations = 45
         self.aoa_reader = AoaReader()
         self.aoa_reader.start_server()
         # joint target
@@ -77,7 +77,9 @@ class Sim2Mujo:
         self.model = mujoco.MjModel.from_xml_path(filename=mujoco_model_path)
         actuators = self.get_joint_names()
         self.cfg = load_configuration("policies/env_cfg.json", actuators)
-        self.hist_obs = CircularBuffer(self.num_observations, self.cfg.hist_length)
+        # self.hist_obs = CircularBuffer(self.num_observations, self.cfg.hist_length)
+        buffer_length = self.cfg.hist_length if self.cfg.hist_length > 0 else 1
+        self.hist_obs = CircularBuffer(self.num_observations, buffer_length)
         self.model.opt.timestep = self.cfg.dt
         self.data = mujoco.MjData(self.model)
         mujoco.mj_step(self.model, self.data)
@@ -165,20 +167,16 @@ class Sim2Mujo:
                 self.command[0] = min(distance, MAX_LINE_VEL)
                 self.command[2] = min(angle, MAX_ANGLE_VEL)
         command = self.command
-        if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
-            self.gait_frequency = 0
-        else:
-            max_abs_command = max(abs(self.command[0]), abs(self.command[1]), abs(self.command[2]))
-            self.gait_frequency = 3.0
+        self.gait_frequency = 1.0
         obs = np.zeros(self.num_observations, dtype=np.float32)
-        obs[0:3] = ang_vel
+        obs[0:3] = ang_vel * 0.2
         obs[3:6] = proj_grav
         obs[6:9] = command
-        obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
-        obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
-        obs[11: 23] = (q - self.cfg.default_joints)[Mujoco_to_Isaac_indices]
-        obs[23: 35] = dq[Mujoco_to_Isaac_indices]
-        obs[35: 47] = self.action[Mujoco_to_Isaac_indices]
+        # obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
+        # obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
+        obs[9: 21] = (q - self.cfg.default_joints)[Mujoco_to_Isaac_indices]
+        obs[21: 33] = dq[Mujoco_to_Isaac_indices] * 0.05
+        obs[33: 45] = self.action[Mujoco_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
         return q, dq, obs
 

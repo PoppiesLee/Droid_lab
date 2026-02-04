@@ -5,26 +5,26 @@
     <joint damping="0.1" armature="0.01" frictionloss="0.3"/>
   </default>
   <asset>
-    <mesh name="base" content_type="model/stl" file="base.STL"/>
-    <mesh name="head_pitch_link" content_type="model/stl" file="head_pitch_link.STL"/>
-    <mesh name="head_yaw_link" content_type="model/stl" file="head_yaw_link.STL"/>
-    <mesh name="FL_thigh_link" content_type="model/stl" file="FL_thigh_link.STL"/>
-    <mesh name="FL_hip_link" content_type="model/stl" file="FL_hip_link.STL"/>
-    <mesh name="FL_calf_link" content_type="model/stl" file="FL_calf_link.STL"/>
-    <mesh name="FL_foot_link" content_type="model/stl" file="FL_foot_link.STL"/>
-    <mesh name="FR_thigh_link" content_type="model/stl" file="FR_thigh_link.STL"/>
-    <mesh name="FR_hip_link" content_type="model/stl" file="FR_hip_link.STL"/>
-    <mesh name="FR_calf_link" content_type="model/stl" file="FR_calf_link.STL"/>
-    <mesh name="FR_foot_link" content_type="model/stl" file="FR_foot_link.STL"/>
-    <mesh name="RL_thigh_link" content_type="model/stl" file="RL_thigh_link.STL"/>
-    <mesh name="RL_hip_link" content_type="model/stl" file="RL_hip_link.STL"/>
-    <mesh name="RL_calf_link" content_type="model/stl" file="RL_calf_link.STL"/>
-    <mesh name="RL_foot_link" content_type="model/stl" file="RL_foot_link.STL"/>
-    <mesh name="RR_thigh_link" content_type="model/stl" file="RR_thigh_link.STL"/>
-    <mesh name="RR_hip_link" content_type="model/stl" file="RR_hip_link.STL"/>
-    <mesh name="RR_calf_link" content_type="model/stl" file="RR_calf_link.STL"/>
-    <mesh name="RR_foot_link" content_type="model/stl" file="RR_foot_link.STL"/>
-    <mesh name="logo" content_type="model/stl" file="logo.STL"/>
+    <mesh name="base" file="base.STL"/>
+    <mesh name="head_pitch_link" file="head_pitch_link.STL"/>
+    <mesh name="head_yaw_link" file="head_yaw_link.STL"/>
+    <mesh name="FL_thigh_link" file="FL_thigh_link.STL"/>
+    <mesh name="FL_hip_link" file="FL_hip_link.STL"/>
+    <mesh name="FL_calf_link" file="FL_calf_link.STL"/>
+    <mesh name="FL_foot_link" file="FL_foot_link.STL"/>
+    <mesh name="FR_thigh_link" file="FR_thigh_link.STL"/>
+    <mesh name="FR_hip_link" file="FR_hip_link.STL"/>
+    <mesh name="FR_calf_link" file="FR_calf_link.STL"/>
+    <mesh name="FR_foot_link" file="FR_foot_link.STL"/>
+    <mesh name="RL_thigh_link" file="RL_thigh_link.STL"/>
+    <mesh name="RL_hip_link" file="RL_hip_link.STL"/>
+    <mesh name="RL_calf_link" file="RL_calf_link.STL"/>
+    <mesh name="RL_foot_link" file="RL_foot_link.STL"/>
+    <mesh name="RR_thigh_link" file="RR_thigh_link.STL"/>
+    <mesh name="RR_hip_link" file="RR_hip_link.STL"/>
+    <mesh name="RR_calf_link" file="RR_calf_link.STL"/>
+    <mesh name="RR_foot_link" file="RR_foot_link.STL"/>
+    <mesh name="logo" file="logo.STL"/>
   </asset>
 
   <worldbody>

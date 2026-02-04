@@ -55,14 +55,10 @@ class Sim2Real(LegBase):
             timer.waiting(start_time)
 
     def update_rc_command(self):
-        self.command[0] = get_command(self.command[0], self.rc.state.LEFT_Y   * 0.5, 0.01)
-        self.command[1] = get_command(self.command[1], self.rc.state.RIGHT_X  * 0.5, 0.01)
-        self.command[2] = get_command(self.command[2], self.rc.state.LEFT_X   * 0.5, 0.01)
-        # 遥控器键值变步频处理
-        if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
-            self.gait_frequency = 0
-        else:
-            self.gait_frequency = 1.5
+        self.command[0] = get_command(self.command[0], self.rc.state.LEFT_Y * 1.0, 0.05)
+        self.command[1] = get_command(self.command[1], self.rc.state.RIGHT_X * 1.0, 0.05)
+        self.command[2] = get_command(self.command[2], self.rc.state.LEFT_X * 1.0, 0.05)
+        self.gait_frequency = 1.5
 
     def get_gravity_orientation_from_rpy(self, roll, pitch):
         rot = R.from_euler('xy', [roll, pitch])

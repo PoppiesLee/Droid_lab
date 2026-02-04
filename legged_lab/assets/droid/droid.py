@@ -13,7 +13,7 @@ Reference: https://github.com/Droidrobotics/Droid_ros
 """
 import os
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import ImplicitActuatorCfg
+from isaaclab.actuators import ImplicitActuatorCfg, IdealPDActuatorCfg
 from isaaclab.assets.articulation import ArticulationCfg
 from legged_lab.assets import ISAAC_ASSET_DIR
 
@@ -303,13 +303,13 @@ E1_CFG = ArticulationCfg(
         #         ".*waist_yaw_joint": 0.01
         #     },
         # ),
-        "legs": ImplicitActuatorCfg(
+        "legs": IdealPDActuatorCfg(
             joint_names_expr=[".*_hip_pitch_joint", ".*_hip_roll_joint", ".*_hip_yaw_joint", ".*_knee_joint"],
             effort_limit_sim={
                 ".*_hip_pitch_joint": 60.0,
                 ".*_hip_roll_joint": 36.0,
                 ".*_hip_yaw_joint": 36.0,
-                ".*_knee_joint": 60.0
+                ".*_knee_joint": 36.0
             },
             velocity_limit_sim={
                 ".*_hip_pitch_joint": 20.42,
@@ -336,11 +336,11 @@ E1_CFG = ArticulationCfg(
                 ".*_knee_joint": 0.01,
             },
         ),
-        "feet": ImplicitActuatorCfg(
+        "feet": IdealPDActuatorCfg(
             joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
             effort_limit_sim={
-                ".*_ankle_pitch_joint": 36.0,
-                ".*_ankle_roll_joint": 28.0
+                ".*_ankle_pitch_joint": 28.0,
+                ".*_ankle_roll_joint": 14.0
             },
             velocity_limit_sim={
                 ".*_ankle_pitch_joint": 30.16,
@@ -401,7 +401,7 @@ E1_DOG_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "legs": ImplicitActuatorCfg(
+        "legs": IdealPDActuatorCfg(
             joint_names_expr=[".*R_hip_joint", ".*L_hip_joint", ".*R_thigh_joint", ".*L_thigh_joint"],
             effort_limit_sim={
                 ".*R_hip_joint":36.0,
@@ -434,7 +434,7 @@ E1_DOG_CFG = ArticulationCfg(
                 ".*L_thigh_joint":0.01,
             },
         ),
-        "feet": ImplicitActuatorCfg(
+        "feet": IdealPDActuatorCfg(
             joint_names_expr=[".*_calf_joint"],
             effort_limit_sim={
                 ".*_calf_joint":36.0,

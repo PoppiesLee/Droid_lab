@@ -124,7 +124,8 @@ class BaseEnv(VecEnv):
 
         # +++++++++++  feet_dist  ++++++++++++
         # feet_pos_w = self.scene["robot"].data.body_pos_w[:, self.feet_cfg.body_ids, :]  # (N, 2, 3)
-        # foot_dist = torch.norm(feet_pos_w[:, 0] - feet_pos_w[:, 1], dim=-1, keepdim=True)  # (N, 1)
+        # foot_dist_front = torch.norm(feet_pos_w[:, 0] - feet_pos_w[:, 1], dim=-1, keepdim=True)  # (N, 1)
+        # foot_dist_back = torch.norm(feet_pos_w[:, 2] - feet_pos_w[:, 3], dim=-1, keepdim=True)  # (N, 1)
         # feet_collision_flag = (foot_dist < 0.22).float()
 
         ang_vel = robot.data.root_ang_vel_b
@@ -150,7 +151,8 @@ class BaseEnv(VecEnv):
             current_actor_obs,
             root_lin_vel * self.obs_scales.lin_vel,
             feet_contact,
-            # foot_dist * self.obs_scales.foot_dist,
+            # foot_dist_front * self.obs_scales.foot_dist,
+            # foot_dist_back  * self.obs_scales.foot_dist,
             # feet_collision_flag * self.obs_scales.feet_collision,
         ], dim=-1)
 

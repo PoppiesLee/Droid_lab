@@ -53,7 +53,7 @@ class BaseEnvCfg:
             joint_vel=1.0,
             actions=1.0,
             height_scan=1.0,
-            # foot_dist = 2.4,
+            # foot_dist = 1.0,
             # feet_collision = 1.0
         ),
         clip_observations=100.0,
@@ -119,7 +119,7 @@ class BaseEnvCfg:
             enable=True,
             params={
                 "body_names": MISSING,
-                "mass_distribution_params": (-1.8, 1.8),
+                "mass_distribution_params": (-3.4, 3.5),
                 "operation": "add",
             }
         ),

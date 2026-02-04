@@ -17,10 +17,10 @@ from isaaclab.utils import configclass
 @configclass
 class E1RewardCfg(RewardCfg):
     track_lin_vel_xy_exp = RewTerm(func=mdp.track_lin_vel_xy_yaw_frame_exp, weight=1.5, params={"std": 0.5})
-    track_ang_vel_z_exp = RewTerm(func=mdp.track_ang_vel_z_world_exp, weight=1.5, params={"std": 0.5})
+    track_ang_vel_z_exp = RewTerm(func=mdp.track_ang_vel_z_world_exp, weight=0.75, params={"std": 0.5})
     lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=-0.15)
     ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.20)
-    dof_vel_l2 = RewTerm(func=mdp.joint_vel_l2, weight=-1e-3)
+    dof_vel_l2 = RewTerm(func=mdp.joint_vel_l2, weight=-1e-5)
     # === 能量与动作平滑 ===
     energy = RewTerm(func=mdp.energy, weight=-1.0e-3)
     dof_acc_l2 = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-7)

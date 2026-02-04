@@ -6,10 +6,9 @@ import onnxruntime as ort
 from base.LegBase import LegBase
 from base.ArmBase import ArmBase
 from base.Base import get_command
-from base.Base import set_joint_mode
 from tools.Gamepad import GamepadHandler
 from tools.CircularBuffer import CircularBuffer
-from tools.load_env_config import load_configuration
+from tools.load_env_config_DOG import load_configuration
 from base.Base import NanoSleep, euler_to_quaternion, quat_rotate_inverse
 from scipy.spatial.transform import Rotation as R
 
@@ -29,7 +28,7 @@ class Sim2Real(ArmBase, LegBase):
         ArmBase.__init__(self)
         LegBase.__init__(self)
         self.num_actions = 12
-        self.num_observations = 47
+        self.num_observations = 45
         self.gait_frequency = 0
         self.cfg = load_configuration("policies/env_cfg.json", RealJointOrder)
         self.run_flag = True
@@ -38,9 +37,8 @@ class Sim2Real(ArmBase, LegBase):
         self.target_q = np.zeros(self.num_actions, dtype=np.double)
         self.action = np.zeros(self.num_actions, dtype=np.double)
         self.onnx_policy = ort.InferenceSession(onnx_mode_path)
-        self.hist_obs = CircularBuffer(self.num_observations, self.cfg.hist_length)
-        # set_joint_mode(self.armCommand, self.cfg, self.armActions)
-        # set_joint_mode(self.legCommand, self.cfg, self.legActions)
+        buffer_length = self.cfg.hist_length if self.cfg.hist_length > 0 else 1
+        self.hist_obs = CircularBuffer(self.num_observations, buffer_length)
         self.rc = GamepadHandler()
 
     def init_robot(self):
@@ -60,14 +58,10 @@ class Sim2Real(ArmBase, LegBase):
             timer.waiting(start_time)
 
     def update_rc_command(self):
-        self.command[0] = get_command(self.command[0], self.rc.state.LEFT_Y   * 0.5, 0.01)
-        self.command[1] = get_command(self.command[1], self.rc.state.RIGHT_X  * 0.5, 0.01)
-        self.command[2] = get_command(self.command[2], self.rc.state.LEFT_X   * 0.5, 0.01)
-        # 遥控器键值变步频处理
-        if abs(self.command[0]) < 0.1 and abs(self.command[1]) < 0.1 and abs(self.command[2]) < 0.1:
-            self.gait_frequency = 0
-        else:
-            self.gait_frequency = 2.5
+        self.command[0] = get_command(self.command[0], self.rc.state.LEFT_Y   * 1.0, 0.05)
+        self.command[1] = get_command(self.command[1], self.rc.state.RIGHT_X  * 1.0, 0.05)
+        self.command[2] = get_command(self.command[2], self.rc.state.LEFT_X   * 1.0, 0.05)
+        self.gait_frequency = 1.0
 
     def get_gravity_orientation_from_rpy(self, roll, pitch):
         rot = R.from_euler('xy', [roll, pitch])
@@ -91,14 +85,14 @@ class Sim2Real(ArmBase, LegBase):
         self.update_rc_command()
 
         obs = np.zeros([self.num_observations], dtype=np.float32)
-        obs[0:3] = base_ang_vel
+        obs[0:3] = base_ang_vel * 0.2
         obs[3:6] = project_gravity
         obs[6:9] = self.command
-        obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
-        obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
-        obs[11: 23] = (q- self.cfg.default_joints)[Real_to_Isaac_indices]
-        obs[23: 35] = dq[Real_to_Isaac_indices]
-        obs[35: 47] = self.action[Real_to_Isaac_indices]
+        # obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
+        # obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
+        obs[9: 21] = (q- self.cfg.default_joints)[Real_to_Isaac_indices]
+        obs[21: 33] = dq[Real_to_Isaac_indices] * 0.05
+        obs[33: 45] = self.action[Real_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
         return q, dq, obs
 

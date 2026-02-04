@@ -6,7 +6,7 @@ from grpc import insecure_channel
 from torch.nn.init import zeros_
 
 from deploy.base.Base import *
-from deploy.base.ConfigE1_DOG import Config
+from deploy.base.ConfigE1 import Config
 from droidup.api import droidup_msg_pb2 as msg_pb2
 from droidup.api import leg_service_pb2_grpc as leg_pb2_grpc
 class LegBase:
