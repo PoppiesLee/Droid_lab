@@ -8,6 +8,7 @@ from pynput import keyboard
 from tqdm import tqdm
 import onnxruntime as ort
 from tools.aoa_ctrl import AoaReader
+# from tools.load_env_config_DOG import load_configuration
 from tools.load_env_config_DOG import load_configuration
 from deploy.tools.CircularBuffer import CircularBuffer
 from tools.data_var import Q, data_dict, QKey_list
@@ -169,13 +170,13 @@ class Sim2Mujo:
         command = self.command
         self.gait_frequency = 1.0
         obs = np.zeros(self.num_observations, dtype=np.float32)
-        obs[0:3] = ang_vel * 0.2
+        obs[0:3] = ang_vel
         obs[3:6] = proj_grav
         obs[6:9] = command
         # obs[9] = np.cos(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
         # obs[10] = np.sin(2 * np.pi * gait_process) * (self.gait_frequency > 1.0e-8)
         obs[9: 21] = (q - self.cfg.default_joints)[Mujoco_to_Isaac_indices]
-        obs[21: 33] = dq[Mujoco_to_Isaac_indices] * 0.05
+        obs[21: 33] = dq[Mujoco_to_Isaac_indices]
         obs[33: 45] = self.action[Mujoco_to_Isaac_indices]
         obs = np.clip(obs, -100, 100)
         return q, dq, obs
